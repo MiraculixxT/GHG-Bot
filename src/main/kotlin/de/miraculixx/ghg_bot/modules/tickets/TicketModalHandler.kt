@@ -1,6 +1,7 @@
 package de.miraculixx.ghg_bot.modules.tickets
 
-import de.miraculixx.ghg_bot.utils.cache.ticketRole
+import de.miraculixx.ghg_bot.utils.cache.ticketQuestionRole
+import de.miraculixx.ghg_bot.utils.cache.ticketReportRole
 import de.miraculixx.ghg_bot.utils.entities.ModalEvent
 import dev.minn.jda.ktx.interactions.components.button
 import dev.minn.jda.ktx.messages.Embed
@@ -42,7 +43,11 @@ class TicketModalHandler : ModalEvent {
         CoroutineScope(Dispatchers.Default).launch {
             val thread = channel.createThreadChannel(type.prefix + user.name, true)
                 .setInvitable(false).complete()
-            thread.send("${ticketRole.asMention}-${this@createTicket.id}-${this@createTicket.asMention}").complete()
+            val ping = when (type) {
+                TicketType.OTHER -> ticketQuestionRole.asMention
+                TicketType.REPORT -> ticketReportRole.asMention
+            }
+            thread.send("${ping}-${this@createTicket.id}-${this@createTicket.asMention}").complete()
             when (type) {
                 TicketType.REPORT -> thread.setupReportTicket(this@createTicket, tag, id, message)
                 TicketType.OTHER -> thread.setupOtherTicket(this@createTicket, message)
