@@ -1,8 +1,6 @@
 package de.miraculixx.ghg_bot.modules.tickets
 
-import de.miraculixx.ghg_bot.utils.cache.guildGHG
-import de.miraculixx.ghg_bot.utils.cache.ticketArchive
-import de.miraculixx.ghg_bot.utils.cache.ticketRole
+import de.miraculixx.ghg_bot.utils.cache.*
 import de.miraculixx.ghg_bot.utils.entities.ButtonEvent
 import dev.minn.jda.ktx.interactions.components.replyModal
 import dev.minn.jda.ktx.messages.Embed
@@ -60,7 +58,10 @@ class TicketButtonHandler : ButtonEvent {
         hook.editMessage(content = "Ticket wird in 5s geschlossen...").queue()
         channel.getHistoryFromBeginning(100).queue { history ->
             CoroutineScope(Dispatchers.Default).launch {
-                val ticketUser = channel.threadMembers.filter { !it.member.roles.contains(ticketRole) }
+                val ticketUser = channel.threadMembers.filter {
+                    val roles = it.member.roles
+                    !roles.contains(ticketQuestionRole) && !roles.contains(ticketReportRole)
+                }
                 val firstMessage = channel.getHistoryFromBeginning(1).complete().retrievedHistory.firstOrNull()?.contentRaw
                 val ownerID = firstMessage?.split('-')?.getOrNull(1)
                 val owner = if (ownerID == null) {
