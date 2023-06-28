@@ -1,6 +1,7 @@
 package de.miraculixx.ghg_bot.commands
 
 import de.miraculixx.ghg_bot.utils.entities.SlashCommandEvent
+import de.miraculixx.ghg_bot.utils.log.noGuild
 import dev.minn.jda.ktx.interactions.components.StringSelectMenu
 import dev.minn.jda.ktx.interactions.components.button
 import dev.minn.jda.ktx.interactions.components.option
@@ -16,6 +17,10 @@ import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu
 
 class AdminCommand : SlashCommandEvent {
     override suspend fun trigger(it: SlashCommandInteractionEvent) {
+        if (it.guild == null) {
+            it.reply_(noGuild).queue()
+            return
+        }
         val channel = it.messageChannel
 
         when (it.subcommandName) {
