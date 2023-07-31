@@ -1,10 +1,7 @@
 package de.miraculixx.ghg_bot.utils.manager
 
 import de.miraculixx.ghg_bot.JDA
-import de.miraculixx.ghg_bot.commands.AdminCommand
-import de.miraculixx.ghg_bot.commands.AutoModCommand
-import de.miraculixx.ghg_bot.commands.HelpCommand
-import de.miraculixx.ghg_bot.commands.LetMeGoogleCommand
+import de.miraculixx.ghg_bot.commands.*
 import de.miraculixx.ghg_bot.modules.auto_support.SupportFilter
 import de.miraculixx.ghg_bot.utils.log.log
 import dev.minn.jda.ktx.events.listener
@@ -23,7 +20,8 @@ object SlashCommandManager {
         "auto-support" to AutoModCommand(),
         "support" to HelpCommand(),
         "admin" to AdminCommand(),
-        "just-google" to LetMeGoogleCommand()
+        "just-google" to LetMeGoogleCommand(),
+        "warnings" to WarnCommand()
     )
 
     fun startListen(jda: JDA) = jda.listener<SlashCommandInteractionEvent> {
@@ -86,11 +84,30 @@ object SlashCommandManager {
                 subcommand("create-notify-panel", "Erstelle das Notification Panel") {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
                 }
+                subcommand("timeout-selection", "Erstelle ein fun timeout panel") {
+                    defaultPermissions = DefaultMemberPermissions.DISABLED
+                }
             },
             Command("just-google", "Erzeugt einen Let-Me-Google-That Link") {
                 defaultPermissions = DefaultMemberPermissions.DISABLED
                 option<String>("prompt", "Was soll gegoogelt werden", true)
                 addOption(OptionType.USER, "ping", "Wer soll gepingt werden", false)
+            },
+            Command("warnings", "Verwalte Warnungen") {
+                subcommand("amount", "Erhalte die Menge an Warnungen") {
+                    defaultPermissions = DefaultMemberPermissions.DISABLED
+                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
+                }
+                subcommand("warn", "Warne einen Nutzer") {
+                    defaultPermissions = DefaultMemberPermissions.DISABLED
+                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
+                    option<String>("reason", "Warum?", true)
+                }
+                subcommand("set-warns", "Ändere Warnungsanzahl") {
+                    defaultPermissions = DefaultMemberPermissions.DISABLED
+                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
+                    option<Int>("amount", "Wie viele?", true)
+                }
             }
         ).queue()
     }

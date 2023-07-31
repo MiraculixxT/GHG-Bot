@@ -7,6 +7,7 @@ import dev.minn.jda.ktx.interactions.components.button
 import dev.minn.jda.ktx.interactions.components.option
 import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.reply_
+import dev.minn.jda.ktx.messages.send
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -35,7 +36,20 @@ class AdminCommand : SlashCommandEvent {
                 channel.sendMessageEmbeds(notifyData.first).addComponents(ActionRow.of(notifyData.second)).queue()
                 it.reply_("Wurde gesendet!", ephemeral = true).queue()
             }
+
+            "timeout-selection" -> {
+                val timeoutData = getTimeoutSelection()
+                it.reply_(embeds = listOf(timeoutData.first), components = listOf(ActionRow.of(timeoutData.second))).queue()
+            }
         }
+    }
+
+    private fun getTimeoutSelection(): Pair<MessageEmbed, List<Button>> {
+        return Embed {
+            title = "**Kostenlose Timeouts**"
+            description = "Hier kannst du dir deinen **kostenlosen** Timeout abholen! \nEinfach auf einen Button unten drücken, der dich am meisten interessiert. \n" +
+                    "Geschenke werden direkt und unwiderruflich ausgehändigt."
+        } to listOf(button("TIMEOUT:1", "1h Timeout", style = ButtonStyle.DANGER), button("TIMEOUT:2", "1d Timeout", style = ButtonStyle.DANGER))
     }
 
     private fun getNotifyPanel(): Pair<MessageEmbed, Button> {

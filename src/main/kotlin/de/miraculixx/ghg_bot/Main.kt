@@ -4,6 +4,8 @@ import de.miraculixx.ghg_bot.config.ConfigManager
 import de.miraculixx.ghg_bot.modules.auto_support.AutoSupportMessages
 import de.miraculixx.ghg_bot.modules.auto_support.AutoSupportReactions
 import de.miraculixx.ghg_bot.modules.auto_support.TabCompleteEvent
+import de.miraculixx.ghg_bot.modules.moderation.SpamCheck
+import de.miraculixx.ghg_bot.modules.moderation.Warnings
 import de.miraculixx.ghg_bot.modules.tickets.TicketMessages
 import de.miraculixx.ghg_bot.utils.log.Color
 import de.miraculixx.ghg_bot.utils.log.consoleChannel
@@ -38,6 +40,7 @@ class Main {
                     "exit" -> {
                         running = false
                         ConfigManager.save()
+                        Warnings.save()
                         JDA.shardManager?.setStatus(OnlineStatus.OFFLINE)
                         JDA.shutdown()
                         println("GHG Bot is now offline!")
@@ -77,10 +80,12 @@ class Main {
         DropDownManager.startListen(JDA)
         ModalManager.startListen(JDA)
         TabCompleteEvent()
+        Warnings
 
         AutoSupportMessages()
         AutoSupportReactions()
         TicketMessages()
+        SpamCheck()
 
         command()
 
