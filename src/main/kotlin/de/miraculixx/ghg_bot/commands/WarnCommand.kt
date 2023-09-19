@@ -27,7 +27,7 @@ class WarnCommand: SlashCommandEvent {
             }
             "warn" -> {
                 val reason = it.getOption("reason")?.asString ?: "Nicht angegeben"
-                val duration = Warnings.warnMember(member, reason)
+                val duration = Warnings.warnMember(member, reason, true)
                 it.reply_("Der Nutzer ${member.asMention} (${member.id}) wurde erfolgreich gewarnt für ``${duration.toKotlinDuration()}``!", ephemeral = true).queue()
             }
             "set-warns" -> {

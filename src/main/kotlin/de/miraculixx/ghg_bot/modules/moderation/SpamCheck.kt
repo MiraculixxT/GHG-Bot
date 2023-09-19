@@ -31,7 +31,7 @@ class SpamCheck : EventListener {
         if (channel.id != "1088197598780866711") return false
         val msg = message.contentRaw
         return if (msg.contains("discord", true) || msg.contains(" ip", true)) {
-            Warnings.warnMember(member, "```fix\nBitte sende keine Werbung für deine oder andere Projekte!```")
+            Warnings.warnMember(member, "```fix\nBitte sende keine Werbung für deine oder andere Projekte!```", false)
             message.delete().queue()
             modLog.send("```fix\nWerbung in spieler-suche Channel:\n$msg``` ${member.asMention} (${member.id})").queue()
             true
@@ -45,8 +45,8 @@ class SpamCheck : EventListener {
             return false
         } else imageSpam[id]?.plus(1) ?: 1
         imageSpam[id] = count
-        return if (count >= 3) {
-            Warnings.warnMember(member, "Bitte spamme keine Gifs, Bilder, Videos, etc...!")
+        return if (count >= 4) {
+            Warnings.warnMember(member, "Bitte spamme keine Gifs, Bilder, Videos, etc...!", false)
             message.delete().queue()
             modLog.send("```fix\nAttachment Spam ($count) in aufeinanderfolgenden Nachrichten.``` ${member.asMention} (${member.id})").queue()
             true
@@ -60,7 +60,7 @@ class SpamCheck : EventListener {
         if (last == null || last.length < 8) return false
         val sim = similarity(last, unformatted)
         return if (sim >= 0.8) {
-            Warnings.warnMember(member, "Du wiederholst dich! Bitte schreibe dieselbe Nachricht nicht mehrmals hintereinander.\n```fix\nNachricht: ${message.contentRaw}```")
+            Warnings.warnMember(member, "Du wiederholst dich! Bitte schreibe dieselbe Nachricht nicht mehrmals hintereinander.\n```fix\nNachricht: ${message.contentRaw}```", false)
             message.delete().queue()
             modLog.send("```fix\nGleiche Nachrichten Spam. ${(sim * 100).toInt()}% gleicher Inhalt in aufeinanderfolgenden Nachrichten.\n\n1. $last\n\n2. $unformatted``` ${member.asMention} (${member.id})").queue()
             true
