@@ -9,6 +9,7 @@ import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.reply_
 import dev.minn.jda.ktx.messages.send
 import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.components.ActionRow
@@ -40,6 +41,10 @@ class AdminCommand : SlashCommandEvent {
             "timeout-selection" -> {
                 val timeoutData = getTimeoutSelection()
                 it.reply_(embeds = listOf(timeoutData.first), components = listOf(ActionRow.of(timeoutData.second))).queue()
+            }
+
+            "clear-threads" -> {
+                (it.guildChannel as TextChannel).threadChannels.forEach { thread -> thread.delete().queue() }
             }
         }
     }
