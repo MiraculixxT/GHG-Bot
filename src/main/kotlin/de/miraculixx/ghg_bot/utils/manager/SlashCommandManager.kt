@@ -87,6 +87,9 @@ object SlashCommandManager {
                 subcommand("timeout-selection", "Erstelle ein fun timeout panel") {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
                 }
+                subcommand("clear-threads", "Lösche alle threads") {
+                    defaultPermissions = DefaultMemberPermissions.DISABLED
+                }
             },
             Command("just-google", "Erzeugt einen Let-Me-Google-That Link") {
                 defaultPermissions = DefaultMemberPermissions.DISABLED
@@ -108,7 +111,7 @@ object SlashCommandManager {
                     addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
                     option<Int>("amount", "Wie viele?", true)
                 }
-            }
+            },
         ).queue()
     }
 }

@@ -6,7 +6,9 @@ import de.miraculixx.ghg_bot.modules.auto_support.AutoSupportReactions
 import de.miraculixx.ghg_bot.modules.auto_support.TabCompleteEvent
 import de.miraculixx.ghg_bot.modules.moderation.SpamCheck
 import de.miraculixx.ghg_bot.modules.moderation.Warnings
+import de.miraculixx.ghg_bot.modules.other.ThreadChannel
 import de.miraculixx.ghg_bot.modules.tickets.TicketMessages
+import de.miraculixx.ghg_bot.modules.voice.AlwaysOneFree
 import de.miraculixx.ghg_bot.utils.log.Color
 import de.miraculixx.ghg_bot.utils.log.consoleChannel
 import de.miraculixx.ghg_bot.utils.log.log
@@ -21,6 +23,7 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.requests.GatewayIntent
+import net.dv8tion.jda.api.utils.MemberCachePolicy
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 
 fun main() {
@@ -41,6 +44,7 @@ class Main {
                         running = false
                         ConfigManager.save()
                         Warnings.save()
+                        AlwaysOneFree.save()
                         JDA.shardManager?.setStatus(OnlineStatus.OFFLINE)
                         JDA.shutdown()
                         println("GHG Bot is now offline!")
@@ -48,6 +52,8 @@ class Main {
 
                     "save" -> {
                         ConfigManager.save()
+                        Warnings.save()
+                        AlwaysOneFree.save()
                         println("Configs saved!")
                     }
 
@@ -66,11 +72,12 @@ class Main {
     init {
         val dcToken = ConfigManager.credentials.dcToken
         JDA = default(dcToken) {
-            disableCache(CacheFlag.VOICE_STATE)
+            enableCache(CacheFlag.VOICE_STATE)
             setActivity(Activity.watching("nach Fragen \uD83D\uDC40"))
             setStatus(OnlineStatus.IDLE)
-            intents += listOf(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
+            intents += listOf(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_VOICE_STATES)
             intents -= listOf(GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_BANS, GatewayIntent.GUILD_MESSAGE_TYPING)
+            setMemberCachePolicy(MemberCachePolicy.DEFAULT)
         }
         JDA.awaitReady()
         consoleChannel = JDA.getTextChannelById(1036256164284997773)!!
@@ -81,6 +88,8 @@ class Main {
         ModalManager.startListen(JDA)
         TabCompleteEvent()
         Warnings
+        ThreadChannel
+        AlwaysOneFree
 
         AutoSupportMessages()
         AutoSupportReactions()

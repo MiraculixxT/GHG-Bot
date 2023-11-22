@@ -28,8 +28,9 @@ class SpamCheck : EventListener {
 
 
     private fun MessageReceivedEvent.checkAds(member: Member): Boolean {
-        if (channel.id != "1088197598780866711") return false
         val msg = message.contentRaw
+        if (msg.contains("butils", true)) message.delete().queue()
+        if (channel.id != "1088197598780866711") return false
         return if (msg.contains("discord", true) || msg.contains(" ip", true)) {
             Warnings.warnMember(member, "```fix\nBitte sende keine Werbung für deine oder andere Projekte!```", false)
             message.delete().queue()
