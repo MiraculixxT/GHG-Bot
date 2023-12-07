@@ -21,11 +21,13 @@ object SlashCommandManager {
         "support" to HelpCommand(),
         "admin" to AdminCommand(),
         "just-google" to LetMeGoogleCommand(),
-        "warnings" to WarnCommand()
+        "warnings" to WarnCommand(),
+        "stream-commands" to StreamCommands()
     )
+    private val streamCommands = setOf("tastatur", "maus", "socials", "merch", "monitor", "mauspad", "mc-settings", "pc-specs", "timolia")
 
     fun startListen(jda: JDA) = jda.listener<SlashCommandInteractionEvent> {
-        val commandClass = commands[it.name] ?: return@listener
+        val commandClass = commands[it.name] ?: (if (streamCommands.contains(it.name)) commands["stream-commands"] else null) ?: return@listener
         val options = buildString { it.options.forEach { option -> append(option.asString + " ") } }
         ">> ${it.user.asTag} -> /${it.name}${it.subcommandName ?: ""} $options".log()
         commandClass.trigger(it)
@@ -112,7 +114,7 @@ object SlashCommandManager {
                     option<Int>("amount", "Wie viele?", true)
                 }
             },
-            *setOf("tastatur", "maus", "socials", "merch", "monitor", "mauspad", "mc-settings", "pc-specs", "timolia").map {
+            *streamCommands.map {
                 Command(it, "Informationen über Basti's $it")
             }.toTypedArray()
         ).queue()
