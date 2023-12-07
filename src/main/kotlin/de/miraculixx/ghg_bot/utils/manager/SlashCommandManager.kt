@@ -112,6 +112,9 @@ object SlashCommandManager {
                     option<Int>("amount", "Wie viele?", true)
                 }
             },
+            *setOf("tastatur", "maus", "socials", "merch", "monitor", "mauspad", "mc-settings", "pc-specs", "timolia").map {
+                Command(it, "Informationen über Basti's $it")
+            }.toTypedArray()
         ).queue()
     }
 }
