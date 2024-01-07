@@ -3,8 +3,10 @@ package de.miraculixx.ghg_bot.commands
 import de.miraculixx.ghg_bot.modules.moderation.Warnings
 import de.miraculixx.ghg_bot.utils.entities.SlashCommandEvent
 import de.miraculixx.ghg_bot.utils.log.noGuild
+import dev.minn.jda.ktx.interactions.components.replyModal
 import dev.minn.jda.ktx.messages.reply_
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent
 import kotlin.time.toKotlinDuration
 
 class WarnCommand: SlashCommandEvent {
@@ -36,5 +38,11 @@ class WarnCommand: SlashCommandEvent {
                 it.reply_("Die Warnings von ${member.asMention} (${member.id}) wurden erfolgreich auf **$amount** gesetzt!", ephemeral = true).queue()
             }
         }
+    }
+
+    override suspend fun triggerUserApp(it: UserContextInteractionEvent) {
+        it.replyModal("WARN:${it.targetMember?.id}", "Warn User") {
+            paragraph("reason", "Reason", true)
+        }.queue()
     }
 }

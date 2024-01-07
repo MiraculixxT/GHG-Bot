@@ -11,9 +11,12 @@ import dev.minn.jda.ktx.interactions.commands.option
 import dev.minn.jda.ktx.interactions.commands.subcommand
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
+import net.dv8tion.jda.api.interactions.commands.build.Commands
 
 object SlashCommandManager {
     private val commands = mapOf(
@@ -22,7 +25,8 @@ object SlashCommandManager {
         "admin" to AdminCommand(),
         "just-google" to LetMeGoogleCommand(),
         "warnings" to WarnCommand(),
-        "stream-commands" to StreamCommands()
+        "stream-commands" to StreamCommands(),
+        "report" to ReportCommand()
     )
     private val streamCommands = setOf("tastatur", "maus", "socials", "merch", "monitor", "mauspad", "mc-settings", "pc-specs", "timolia")
 
@@ -31,6 +35,22 @@ object SlashCommandManager {
         val options = buildString { it.options.forEach { option -> append(option.asString + " ") } }
         ">> ${it.user.asTag} -> /${it.name}${it.subcommandName ?: ""} $options".log()
         commandClass.trigger(it)
+    }
+
+    private val onUserApp = JDA.listener<UserContextInteractionEvent> {
+        val commandClass = when (it.name) {
+            "Melde Nutzer" -> commands["report"]
+            else -> commands[it.name]
+        } ?: return@listener
+        commandClass.triggerUserApp(it)
+    }
+
+    private val onMessageApp = JDA.listener<MessageContextInteractionEvent> {
+        val commandClass = when (it.name) {
+            "Melde Nachricht" -> commands["report"]
+            else -> commands[it.name]
+        } ?: return@listener
+        commandClass.triggerMessageApp(it)
     }
 
     init {
@@ -92,6 +112,9 @@ object SlashCommandManager {
                 subcommand("clear-threads", "Lösche alle threads") {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
                 }
+                subcommand("vote-info", "Printe vote info") {
+                    defaultPermissions = DefaultMemberPermissions.DISABLED
+                }
             },
             Command("just-google", "Erzeugt einen Let-Me-Google-That Link") {
                 defaultPermissions = DefaultMemberPermissions.DISABLED
@@ -116,7 +139,10 @@ object SlashCommandManager {
             },
             *streamCommands.map {
                 Command(it, "Informationen über Basti's $it")
-            }.toTypedArray()
+            }.toTypedArray(),
+            Commands.user("Melde Nutzer").setGuildOnly(true),
+            Commands.message("Melde Nachricht").setGuildOnly(true),
+            Commands.user("warnings").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.DISABLED),
         ).queue()
     }
 }

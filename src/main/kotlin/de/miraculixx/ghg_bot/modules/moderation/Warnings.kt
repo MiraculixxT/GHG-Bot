@@ -1,7 +1,10 @@
 package de.miraculixx.ghg_bot.modules.moderation
 
+import de.miraculixx.ghg_bot.utils.cache.guildGHG
 import de.miraculixx.ghg_bot.utils.cache.modLog
+import de.miraculixx.ghg_bot.utils.entities.ModalEvent
 import dev.minn.jda.ktx.messages.Embed
+import dev.minn.jda.ktx.messages.reply_
 import dev.minn.jda.ktx.messages.send
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,6 +14,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import java.io.File
 import java.time.Duration
 import java.time.Instant
@@ -18,7 +22,7 @@ import java.time.ZoneId
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.toKotlinDuration
 
-object Warnings {
+object Warnings : ModalEvent {
     private val file = File("config/warns.json")
     private var manualWarnings: MutableMap<String, Int> = mutableMapOf()
     private var autoWarnings: MutableMap<String, Int> = mutableMapOf()
@@ -29,7 +33,7 @@ object Warnings {
 
     fun getWarnings(id: String): Int = manualWarnings[id] ?: 0
 
-    fun warnMember(member: Member, reason: String, admin: Boolean): Duration {
+    fun warnMember(member: Member, reason: String, admin: Boolean, punishment: Boolean = true): Duration {
         val id = member.id
 
         val duration = if (admin) {
@@ -49,7 +53,7 @@ object Warnings {
                 11 -> Duration.ofDays(7)
                 else -> Duration.ofDays(14)
             }
-        } else {
+        } else if (punishment) {
             val newWarnings = autoWarnings[id]?.plus(1) ?: 1
             autoWarnings[id] = newWarnings
             when (newWarnings) {
@@ -62,17 +66,29 @@ object Warnings {
                 7 -> Duration.ofHours(12)
                 else -> Duration.ofHours(24)
             }
-        }
+        } else Duration.ZERO
 
-        member.timeoutFor(duration).queue()
-        member.user.openPrivateChannel().flatMap { it.send(embeds = listOf(Embed {
-            title = "Warnung Erhalten"
-            description = "Aufgrund eines Regelbruchs wurdest du gewarnt!\n\n$reason\n\n- Timeout Dauer: **${duration.toKotlinDuration()}**"
-            footer {
-                name = "Bei Fragen oder Problemen @miraculixx kontaktieren"
-            }
-        })) }.queue()
+        if (duration != Duration.ZERO) member.timeoutFor(duration).queue()
+        try {
+            member.user.openPrivateChannel().flatMap {
+                it.send(embeds = listOf(Embed {
+                    title = "Warnung Erhalten"
+                    description = "Aufgrund eines Regelbruchs wurdest du gewarnt!\n\n$reason\n\n- Timeout Dauer: **${duration.toKotlinDuration()}**"
+                    footer {
+                        name = "Bei Fragen oder Problemen @miraculixx kontaktieren"
+                    }
+                }))
+            }.queue()
+        } catch (_: Exception) {}
         return duration
+    }
+
+    override suspend fun trigger(it: ModalInteractionEvent) {
+        val reason = it.getValue("reason")?.asString ?: return
+        val user = it.modalId.split(":").last()
+        val member = guildGHG.getMemberById(user) ?: guildGHG.retrieveMemberById(user).complete() ?: return
+        warnMember(member, reason, true)
+        it.reply_("Warned user").queue()
     }
 
     private fun task() {

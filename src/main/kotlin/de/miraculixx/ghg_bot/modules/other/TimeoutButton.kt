@@ -20,6 +20,11 @@ class TimeoutButton : ButtonEvent {
                 member.timeoutFor(Duration.ofDays(1)).queue()
                 it.reply_("Hier ist dein kostenloser 1 Stunde Timeout :gift:", ephemeral = true).queue()
             }
+
+            "TIMEOUT:3" -> {
+                member.removeTimeout().queue()
+                it.reply_("```diff\n- Du bist aktuell nicht im Timeout! Hole dir einen kostenlosen Timeout links ab damit der Timeout entferner funktioniert (max 1 pro h)```", ephemeral = true).queue()
+            }
         }
     }
 }

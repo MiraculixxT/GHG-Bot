@@ -17,11 +17,11 @@ object AlwaysOneFree : EventListener {
     private val file = File("config/voice.json")
 
     private val category = JDA.getCategoryById(486142012194684928)!!
-    private val channelsUnlimited: MutableSet<VoiceChannel> = mutableSetOf(JDA.getVoiceChannelById(1176194471365451808)!!)
-    private val channels2: MutableSet<VoiceChannel> = mutableSetOf(JDA.getVoiceChannelById(1176194234869612695)!!)
-    private val channels3: MutableSet<VoiceChannel> = mutableSetOf(JDA.getVoiceChannelById(486142238129258515)!!)
-    private val channels4: MutableSet<VoiceChannel> = mutableSetOf(JDA.getVoiceChannelById(1176192732994207775)!!)
-    private val channels5: MutableSet<VoiceChannel> = mutableSetOf(JDA.getVoiceChannelById(1176165143726530560)!!)
+    private val channelsUnlimited: MutableSet<VoiceChannel> = mutableSetOf(JDA.getVoiceChannelById(1185571848721801256)!!)
+    private val channels2: MutableSet<VoiceChannel> = mutableSetOf(JDA.getVoiceChannelById(1185596058714243152)!!)
+    private val channels3: MutableSet<VoiceChannel> = mutableSetOf(JDA.getVoiceChannelById(1185596259290075136)!!)
+    private val channels4: MutableSet<VoiceChannel> = mutableSetOf(JDA.getVoiceChannelById(1185596226926805042)!!)
+    private val channels5: MutableSet<VoiceChannel> = mutableSetOf(JDA.getVoiceChannelById(1185596289493250098)!!)
 
     override val listener: CoroutineEventListener = JDA.listener<GuildVoiceUpdateEvent> {
         val joined = it.channelJoined?.asVoiceChannel()

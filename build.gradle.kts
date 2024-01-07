@@ -15,6 +15,7 @@ repositories {
 dependencies {
     implementation("net.dv8tion", "JDA", "5.0.0-beta.2")
     implementation("com.github.minndevelopment", "jda-ktx","0.10.0-beta.1")
+    implementation("club.minnced","discord-webhooks","0.8.4")
 
     implementation("org.jetbrains.kotlinx", "kotlinx-serialization-json", "1.3.3")
 

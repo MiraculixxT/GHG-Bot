@@ -1,8 +1,10 @@
 package de.miraculixx.ghg_bot.modules.tickets
 
+import de.miraculixx.ghg_bot.JDA
 import de.miraculixx.ghg_bot.utils.cache.ticketQuestionRole
 import de.miraculixx.ghg_bot.utils.cache.ticketReportRole
 import de.miraculixx.ghg_bot.utils.entities.ModalEvent
+import dev.minn.jda.ktx.generics.getChannel
 import dev.minn.jda.ktx.interactions.components.button
 import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.editMessage
@@ -19,9 +21,10 @@ import net.dv8tion.jda.api.interactions.InteractionHook
 import net.dv8tion.jda.api.interactions.components.ActionRow
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
 
-class TicketModalHandler : ModalEvent {
+object TicketModalHandler : ModalEvent {
     private val buttonCloseReport = button("TICKET-CLOSE-REPORT", "Schließen", Emoji.fromFormatted("\uD83D\uDD12"), ButtonStyle.DANGER)
     private val buttonCloseOther = button("TICKET-CLOSE", "Schließen", Emoji.fromFormatted("\uD83D\uDD12"), ButtonStyle.DANGER)
+    private val reportChannel = JDA.getChannel<TextChannel>(859833491251789844)!!
 
     override suspend fun trigger(it: ModalInteractionEvent) {
         val member = it.member ?: return
@@ -32,16 +35,16 @@ class TicketModalHandler : ModalEvent {
         if (channel !is TextChannel) return
 
         when (it.modalId) {
-            "TICKET-REPORT" -> member.createTicket(TicketType.REPORT, message, hook, it.getValue("TAG")?.asString, it.getValue("ID")?.asString, channel)
-            "TICKET-OTHER" -> member.createTicket(TicketType.OTHER, message, hook, channel = channel)
+            "TICKET-REPORT" -> member.createTicket(TicketType.REPORT, message, hook, it.getValue("TAG")?.asString, it.getValue("ID")?.asString)
+            "TICKET-OTHER" -> member.createTicket(TicketType.OTHER, message, hook)
 
             else -> hook.editMessage(content = "```diff\n- Ein Fehler ist aufgetreten! Bitte melde dies an einen Moderator```").queue()
         }
     }
 
-    private fun Member.createTicket(type: TicketType, message: String, source: InteractionHook, tag: String? = null, id: String? = null, channel: TextChannel) {
+    fun Member.createTicket(type: TicketType, message: String, source: InteractionHook, tag: String? = null, id: String? = null) {
         CoroutineScope(Dispatchers.Default).launch {
-            val thread = channel.createThreadChannel(type.prefix + user.name, true)
+            val thread = reportChannel.createThreadChannel(type.prefix + user.name, true)
                 .setInvitable(false).complete()
             val ping = when (type) {
                 TicketType.OTHER -> ticketQuestionRole.asMention

@@ -6,6 +6,7 @@ import de.miraculixx.ghg_bot.modules.auto_support.AutoSupportReactions
 import de.miraculixx.ghg_bot.modules.auto_support.TabCompleteEvent
 import de.miraculixx.ghg_bot.modules.moderation.SpamCheck
 import de.miraculixx.ghg_bot.modules.moderation.Warnings
+import de.miraculixx.ghg_bot.modules.other.CommandOnlyChannel
 import de.miraculixx.ghg_bot.modules.other.ThreadChannel
 import de.miraculixx.ghg_bot.modules.tickets.TicketMessages
 import de.miraculixx.ghg_bot.modules.voice.AlwaysOneFree
@@ -89,7 +90,8 @@ class Main {
         TabCompleteEvent()
         Warnings
         ThreadChannel
-        AlwaysOneFree
+//        AlwaysOneFree
+        CommandOnlyChannel
 
         AutoSupportMessages()
         AutoSupportReactions()
