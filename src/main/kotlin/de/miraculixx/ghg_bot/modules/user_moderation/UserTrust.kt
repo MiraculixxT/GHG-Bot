@@ -10,7 +10,7 @@ data class UserTrust(
     var points: Int
 ) {
     fun getLevelMultiplier() = when (level) {
-        -1 -> 0.5f
+        in Int.MIN_VALUE .. -1 -> 0.5f
         0 -> 1.0f
         1 -> 1.25f
         2 -> 1.5f
@@ -33,7 +33,7 @@ data class UserTrust(
         points -= p
         if (points < 0) {
             level--
-            points = (100 * 1.25f.pow(level)).toInt()
+            points = (100 * 1.25f.pow(level)).toInt().coerceAtLeast(100)
         }
     }
 }
