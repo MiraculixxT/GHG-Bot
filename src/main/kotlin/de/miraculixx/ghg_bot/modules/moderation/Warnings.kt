@@ -88,7 +88,7 @@ object Warnings : ModalEvent {
         val user = it.modalId.split(":").last()
         val member = guildGHG.getMemberById(user) ?: guildGHG.retrieveMemberById(user).complete() ?: return
         warnMember(member, reason, true)
-        it.reply_("Warned user").queue()
+        it.reply_("Warned user", ephemeral = true).queue()
     }
 
     private fun task() {

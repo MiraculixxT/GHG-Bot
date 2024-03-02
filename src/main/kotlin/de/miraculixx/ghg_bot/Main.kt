@@ -9,6 +9,7 @@ import de.miraculixx.ghg_bot.modules.moderation.Warnings
 import de.miraculixx.ghg_bot.modules.other.CommandOnlyChannel
 import de.miraculixx.ghg_bot.modules.other.ThreadChannel
 import de.miraculixx.ghg_bot.modules.tickets.TicketMessages
+import de.miraculixx.ghg_bot.modules.user_moderation.UserModerationManager
 import de.miraculixx.ghg_bot.modules.voice.AlwaysOneFree
 import de.miraculixx.ghg_bot.utils.log.Color
 import de.miraculixx.ghg_bot.utils.log.consoleChannel
@@ -45,16 +46,15 @@ class Main {
                         running = false
                         ConfigManager.save()
                         Warnings.save()
-                        AlwaysOneFree.save()
+                        UserModerationManager.save()
                         JDA.shardManager?.setStatus(OnlineStatus.OFFLINE)
                         JDA.shutdown()
-                        println("GHG Bot is now offline!")
                     }
 
                     "save" -> {
                         ConfigManager.save()
                         Warnings.save()
-                        AlwaysOneFree.save()
+                        UserModerationManager.save()
                         println("Configs saved!")
                     }
 
@@ -90,7 +90,7 @@ class Main {
         TabCompleteEvent()
         Warnings
         ThreadChannel
-//        AlwaysOneFree
+        AlwaysOneFree
         CommandOnlyChannel
 
         AutoSupportMessages()
@@ -98,9 +98,9 @@ class Main {
         TicketMessages()
         SpamCheck()
 
-        command()
-
         "GHG Bot is now online!".log(Color.GREEN)
+
+        command()
     }
 }
 
