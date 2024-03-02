@@ -26,7 +26,8 @@ object SlashCommandManager {
         "just-google" to LetMeGoogleCommand(),
         "warnings" to WarnCommand(),
         "stream-commands" to StreamCommands(),
-        "report" to ReportCommand()
+        "report" to ReportCommand(),
+        "reputation" to UserModerationCommand()
     )
     private val streamCommands = setOf("tastatur", "maus", "socials", "merch", "monitor", "mauspad", "mc-settings", "pc-specs", "timolia")
 
@@ -135,6 +136,20 @@ object SlashCommandManager {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
                     addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
                     option<Int>("amount", "Wie viele?", true)
+                }
+            },
+            Command("reputation", "Manage User Reputation") {
+                defaultPermissions = DefaultMemberPermissions.DISABLED
+                subcommand("add", "Add Reputation to a User") {
+                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
+                    option<Int>("points", "Wie viele Punkte?", true)
+                }
+                subcommand("remove", "Remove Reputation from a User") {
+                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
+                    option<Int>("points", "Wie viele Punkte?", true)
+                }
+                subcommand("get", "Get Reputation of a User") {
+                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
                 }
             },
             *streamCommands.map {
