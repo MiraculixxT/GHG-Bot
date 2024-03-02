@@ -27,7 +27,8 @@ object SlashCommandManager {
         "warnings" to WarnCommand(),
         "stream-commands" to StreamCommands(),
         "report" to ReportCommand(),
-        "reputation" to UserModerationCommand()
+        "reputation" to UserModerationCommand(),
+        "message" to MessageCommand(),
     )
     private val streamCommands = setOf("tastatur", "maus", "socials", "merch", "monitor", "mauspad", "mc-settings", "pc-specs", "timolia")
 
@@ -69,14 +70,14 @@ object SlashCommandManager {
                 defaultPermissions = DefaultMemberPermissions.DISABLED
                 subcommand("list", "Zeige alle Filter Events") {
                     option<String>("filter", "Welchen Filter?", true) {
-                        SupportFilter.values().forEach { filter ->
+                        SupportFilter.entries.forEach { filter ->
                             choice(filter.name, filter.name)
                         }
                     }
                 }
                 subcommand("add", "Füge ein neuen Filter hinzu") {
                     option<String>("filter", "Welchen Filter?", true) {
-                        SupportFilter.values().forEach { filter ->
+                        SupportFilter.entries.forEach { filter ->
                             choice(filter.name, filter.name)
                         }
                     }
@@ -84,7 +85,7 @@ object SlashCommandManager {
                 }
                 subcommand("remove", "Entferne einen aktuellen Filter") {
                     option<String>("filter", "Welchen Filter?", true) {
-                        SupportFilter.values().forEach { filter ->
+                        SupportFilter.entries.forEach { filter ->
                             choice(filter.name, filter.name)
                         }
                     }
@@ -94,7 +95,7 @@ object SlashCommandManager {
             Command("support", "Sende eine Support Nachricht") {
                 defaultPermissions = DefaultMemberPermissions.DISABLED
                 option<String>("type", "Welche Support Nachricht?", true) {
-                    SupportFilter.values().forEach { filter ->
+                    SupportFilter.entries.forEach { filter ->
                         choice(filter.name, filter.name)
                     }
                 }
@@ -150,6 +151,15 @@ object SlashCommandManager {
                 }
                 subcommand("get", "Get Reputation of a User") {
                     addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
+                }
+            },
+            Command("message", "Send and handle bot messages") {
+                subcommand("say", "Send a simple message") {
+                    option<String>("message", "What should be sent?", true)
+                }
+                subcommand("say-json", "Send a complex message from https://discohook.org") {
+                    option<String>("json", "The JSON context", true)
+                    addOption(OptionType.ATTACHMENT, "upload", "The file to upload", false)
                 }
             },
             *streamCommands.map {
