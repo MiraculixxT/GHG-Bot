@@ -4,6 +4,7 @@ import de.miraculixx.ghg_bot.modules.moderation.Warnings
 import de.miraculixx.ghg_bot.utils.cache.guildGHG
 import de.miraculixx.ghg_bot.utils.entities.ButtonEvent
 import de.miraculixx.ghg_bot.utils.extensions.toMember
+import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.editMessage_
 import dev.minn.jda.ktx.messages.reply_
 import kotlinx.serialization.decodeFromString
@@ -55,9 +56,24 @@ class ButtonsVoteAdmin: ButtonEvent {
             }
 
             "POINTS" -> {
-                it.reply_("```fix\nVorerst ist es nicht möglich seine eigenen Punkte einzusehen. Dies wird jedoch mal geändert. Stay tuned :)```", ephemeral = true).queue()
+                val reputation = UserModerationManager.userTrust[it.user.idLong] ?: UserTrust(it.user.idLong, 0, 0)
+                val percentage = reputation.getLevelPercentage()
+                val progressBar = ":blue_square:".repeat(percentage / 10) + ":white_large_square:".repeat(10 - percentage / 10)
+
+                it.reply_(embeds = listOf(Embed {
+                    title = "\uD83D\uDCCA  || Deine Reputation"
+                    description = "Die Reputation entscheidet wie viel Kraft deine Stimme beim voten hat. Wenn du häufig richtig votest steigt deine Reputation!\n" +
+                            "‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n" +
+                            "<:blanc:1193179205589008455> <:blanc:1193179205589008455> <:blanc:1193179205589008455><:blanc:1193179205589008455> :star: **LEVEL ${reputation.level}**\n" +
+                            "**${percentage.twoDigitCheck()}%** $progressBar ${reputation.points}/${reputation.getCurrentLevelMax()}"
+                    color = 0x27a7e9
+                }), ephemeral = true).queue()
             }
             else -> return
         }
+    }
+
+    private fun Int.twoDigitCheck(): String {
+        return if (this < 10) "0$this" else toString()
     }
 }

@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.interactions.InteractionHook
 import net.dv8tion.jda.api.interactions.components.ActionRow
 import java.util.*
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -38,7 +39,8 @@ data class MessageReport(
         finalMessage = message.mentionlessContent()
 
         reportCaseMessage = UserModerationManager.reportChannel.send(
-            embeds = listOf(buildEmbed()),
+            "<@&1193568003154006098>",
+            embeds = listOf(buildEmbed(0 to 1)),
             components = listOf(
                 ActionRow.of(
                     danger("REPORT:VOTE-YES:$uuid", "Schuldig"),
@@ -87,16 +89,18 @@ data class MessageReport(
         )
     }
 
-    fun update(hook: InteractionHook) {
-        hook.editOriginalEmbeds(buildEmbed()).queue()
+    fun update(hook: InteractionHook, votes: Pair<Int, Int>) {
+        hook.editOriginalEmbeds(buildEmbed(votes)).queue()
     }
 
-    private fun buildEmbed() = Embed {
+    private fun buildEmbed(votes: Pair<Int, Int>) = Embed {
+        println(votes.toString() + " - ${votes.first.toFloat() / (votes.second + votes.first)} - ${(votes.first.toFloat() / (votes.second + votes.first)) * 100}")
+        val percentage = ((votes.first.toFloat() / (votes.second + votes.first)) * 100).roundToInt()
         title = "🔨 || Neue Meldung"
         field("Grund 📧", "```fix\n$reason ${if (message.attachments.isNotEmpty()) "(Anhänge siehe Kontext)" else ""}```", false)
         field("Nachricht \uD83D\uDCAC", "> ${finalMessage.ifBlank { "`<Leere Nachricht - Siehe Kontext>`" }}", false)
         field(
-            "Aktuelle Entscheidung \uD83D\uDCCA",
+            "Aktuelle Entscheidung - $percentage% \uD83D\uDCCA",
             "<:zickzackApfeldieb:591330133349236774> `${voteYes.size}` <:blanc:1193179205589008455> <:blanc:1193179205589008455> <:peopHappy:592306163341721626> `${voteNo.size}`",
             false
         )
@@ -110,15 +114,15 @@ data class MessageReport(
         var yes = 0.0f
         var no = 0.0f
         voteYes.forEach {
-            yes += 1 * it.getLevelMultiplier()
+            yes += 1.0f * it.getLevelMultiplier()
         }
         voteNo.forEach {
-            no += 1 * it.getLevelMultiplier()
+            no += 1.0f * it.getLevelMultiplier()
         }
-        return yes.toInt() to no.toInt()
+        return yes.roundToInt() to no.roundToInt()
     }
 
-    suspend fun cleanUp(guilty: Boolean) {
+    suspend fun cleanUp(guilty: Boolean, votes: Pair<Int, Int>) {
         reportCaseThread.delete().queue()
         reportCaseMessage.editMessageComponents(emptyList()).queue()
         delay(1.seconds)
@@ -132,7 +136,7 @@ data class MessageReport(
         val reportLogData = ReportVoteData(guilty, snitch.idLong, message.author.idLong, voteYes.map { it.userID }.toSet(), voteNo.map { it.userID }.toSet())
         UserModerationManager.reportLogChannel.send("||${Json.encodeToString(reportLogData)}||", embeds = listOf(Embed {
             title = "🔨 || Meldung abgeschlossen"
-            description = "Der Report wurde als __**${if (guilty) "schuldig" else "unschuldig"}**__ markiert."
+            description = "Der Report wurde als __**${if (guilty) "schuldig" else "unschuldig"}**__ markiert. (${votes.first} | ${votes.second} -> ${votes.first / (votes.second + votes.first)}%)"
             field("Grund \uD83D\uDCE7", "```fix\n$reason```", false)
             field("Nachricht \uD83D\uDCAC", "```fix\n${message.mentionlessContent().ifBlank { "<empty>" }}```", false)
             field(
