@@ -29,6 +29,7 @@ class TicketButtonHandler : ButtonEvent {
                 short("ID", "Nutzer ID", false, null, member.id, 17..20)
                 paragraph("CONTENT", "Grund", true, null, "Warum möchtest du den Nutzer melden?") {
                     minLength = 50
+                    maxLength = 2000
                 }
             }.queue()
 

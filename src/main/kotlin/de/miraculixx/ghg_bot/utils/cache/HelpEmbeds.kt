@@ -35,10 +35,11 @@ val embedDeathrun = Embed {
 
 val embedChallenges = Embed {
     description =
-        "Basti hat keinen Challenge Server und auch kein öffentliches Challenge Plugin! Wenn du selbst welche spielen möchtest, musst du sie dir selbst erstellen oder frage in <#568922343611826186> nach, ob ein **sicheres** bekannt ist.\n" +
+        "Basti hat keinen Challenge Server und auch kein öffentliches Challenge Plugin! " +
+                "Wenn du selbst welche spielen möchtest, musst du sie dir selbst erstellen oder such auf [**__Modrinth__**](https://modrinth.com/plugins) nach z.b. [Challenges](https://modrinth.com/plugins?q=challenges&l=true).\n" +
                 "\n" +
                 "**WARNUNG** " +
-                "```diff\n- Gerade auf spigotmc treiben sich viele Plugins um, die primär darauf aus sind dir zu schaden!```"
+                "```diff\n- Nutze keine Plugins von SpigotMC! Diese werden nicht geprüft und enthalten häufig tracking oder schadsoftware!```"
     color = 0xcc0000
     applyAutoFooter()
 }

@@ -68,16 +68,27 @@ object Warnings : ModalEvent {
             }
         } else Duration.ZERO
 
-        if (duration != Duration.ZERO) member.timeoutFor(duration).queue()
+        val embed = if (duration != Duration.ZERO) {
+            member.timeoutFor(duration).queue()
+            Embed {
+                title = "Warnung Erhalten"
+                description = "Aufgrund eines Regelbruchs wurdest du gewarnt!\n\n$reason\n\n- Timeout Dauer: **${duration.toKotlinDuration()}**"
+                footer {
+                    name = "Bei Fragen oder Problemen @miraculixx kontaktieren"
+                }
+            }
+        } else {
+            Embed {
+                title = "Mitteilung Erhalten"
+                description = "Deine Nachricht konnte nicht gesendet werden, da sie gegen die Channel Regeln ist!\n\n```fix\n$reason```"
+                footer {
+                    name = "Bei Fragen oder Problemen @miraculixx kontaktieren"
+                }
+            }
+        }
         try {
             member.user.openPrivateChannel().flatMap {
-                it.send(embeds = listOf(Embed {
-                    title = "Warnung Erhalten"
-                    description = "Aufgrund eines Regelbruchs wurdest du gewarnt!\n\n$reason\n\n- Timeout Dauer: **${duration.toKotlinDuration()}**"
-                    footer {
-                        name = "Bei Fragen oder Problemen @miraculixx kontaktieren"
-                    }
-                }))
+                it.send(embeds = listOf(embed))
             }.queue()
         } catch (_: Exception) {}
         return duration

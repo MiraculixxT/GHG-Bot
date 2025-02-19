@@ -7,7 +7,9 @@ import de.miraculixx.ghg_bot.modules.auto_support.TabCompleteEvent
 import de.miraculixx.ghg_bot.modules.moderation.SpamCheck
 import de.miraculixx.ghg_bot.modules.moderation.Warnings
 import de.miraculixx.ghg_bot.modules.other.CommandOnlyChannel
+import de.miraculixx.ghg_bot.modules.other.MediaOnlyChannel
 import de.miraculixx.ghg_bot.modules.other.ThreadChannel
+import de.miraculixx.ghg_bot.modules.other.StickyMessage
 import de.miraculixx.ghg_bot.modules.tickets.TicketMessages
 import de.miraculixx.ghg_bot.modules.user_moderation.UserModerationManager
 import de.miraculixx.ghg_bot.modules.voice.AlwaysOneFree
@@ -47,6 +49,11 @@ class Main {
                         ConfigManager.save()
                         Warnings.save()
                         UserModerationManager.save()
+
+                        CommandOnlyChannel.save()
+                        MediaOnlyChannel.save()
+                        StickyMessage.save()
+
                         JDA.shardManager?.setStatus(OnlineStatus.OFFLINE)
                         JDA.shutdown()
                     }
@@ -55,6 +62,11 @@ class Main {
                         ConfigManager.save()
                         Warnings.save()
                         UserModerationManager.save()
+
+                        CommandOnlyChannel.save()
+                        MediaOnlyChannel.save()
+                        StickyMessage.save()
+
                         println("Configs saved!")
                     }
 
@@ -77,7 +89,7 @@ class Main {
             setActivity(Activity.watching("nach Fragen \uD83D\uDC40"))
             setStatus(OnlineStatus.IDLE)
             intents += listOf(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_VOICE_STATES)
-            intents -= listOf(GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_BANS, GatewayIntent.GUILD_MESSAGE_TYPING)
+            intents -= listOf(GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_MESSAGE_TYPING)
             setMemberCachePolicy(MemberCachePolicy.DEFAULT)
         }
         JDA.awaitReady()
@@ -97,6 +109,8 @@ class Main {
         AutoSupportReactions()
         TicketMessages()
         SpamCheck()
+
+        StickyMessage
 
         "GHG Bot is now online!".log(Color.GREEN)
 

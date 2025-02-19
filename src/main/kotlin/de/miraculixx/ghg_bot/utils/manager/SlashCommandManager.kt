@@ -29,6 +29,7 @@ object SlashCommandManager {
         "report" to ReportCommand(),
         "reputation" to UserModerationCommand(),
         "message" to MessageCommand(),
+        "channel" to ChannelCommand(),
     )
     private val streamCommands = setOf("tastatur", "maus", "socials", "merch", "monitor", "mauspad", "mc-settings", "pc-specs", "timolia")
 
@@ -154,12 +155,21 @@ object SlashCommandManager {
                 }
             },
             Command("message", "Send and handle bot messages") {
+                defaultPermissions = DefaultMemberPermissions.DISABLED
                 subcommand("say", "Send a simple message") {
                     option<String>("message", "What should be sent?", true)
                 }
                 subcommand("say-json", "Send a complex message from https://discohook.org") {
                     option<String>("json", "The JSON context", true)
                     addOption(OptionType.ATTACHMENT, "upload", "The file to upload", false)
+                }
+            },
+            Command("channel", "Toggle a channel type") {
+                defaultPermissions = DefaultMemberPermissions.DISABLED
+                subcommand("command-only", "Toggle command only for current channel")
+                subcommand("media-only", "Toggle command only for current channel")
+                subcommand("sticky-message", "Setup a sticky message for this channel") {
+                    option<String>("message", "Enter . to remove any message", true)
                 }
             },
             *streamCommands.map {

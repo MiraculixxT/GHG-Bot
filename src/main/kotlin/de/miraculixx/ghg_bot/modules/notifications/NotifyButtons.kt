@@ -14,9 +14,9 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
 
 class NotifyButtons : ButtonEvent {
-    private val ytMainRole = guildGHG.getRoleById(604279182872018974)!!
-    private val ytSecondRole = guildGHG.getRoleById(604279184038297620)!!
-    private val twitchRole = guildGHG.getRoleById(604277191823589396)!!
+    private val ytMainRole = guildGHG.getRoleById(604279182872018974)
+    private val ytSecondRole = guildGHG.getRoleById(604279184038297620)
+    private val twitchRole = guildGHG.getRoleById(604277191823589396)
     private val bellActive = Emoji.fromFormatted("\uD83D\uDD14")
     private val bellDisabled = Emoji.fromFormatted("\uD83D\uDD15")
     private val notifyEmbed = Embed {
@@ -28,6 +28,10 @@ class NotifyButtons : ButtonEvent {
     }
 
     override suspend fun trigger(it: ButtonInteractionEvent) {
+        if (ytMainRole == null || ytSecondRole == null || twitchRole == null) {
+            it.reply_("Ein Fehler ist aufgetreten!").queue()
+            return
+        }
         val member = it.member ?: return
 
         when (it.componentId) {

@@ -49,6 +49,7 @@ class TicketDropDownHandler : DropDownEvent {
             "SONSTIGES" -> it.replyModal("TICKET-OTHER", "Neues Ticket") {
                 paragraph("CONTENT", "Deine Nachricht", true, null, "Mit dieser Nachricht beginnt das Ticket") {
                     minLength = 50
+                    maxLength = 2000
                 }
             }.queue()
         }
