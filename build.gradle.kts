@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation("net.dv8tion", "JDA", "5.3.0")
+    implementation("net.dv8tion", "JDA", "5.6.1")
     implementation("com.github.minndevelopment", "jda-ktx", "0.12.0")
     implementation("club.minnced", "discord-webhooks", "0.8.4")
 

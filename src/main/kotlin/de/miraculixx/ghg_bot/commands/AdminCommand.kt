@@ -1,21 +1,56 @@
 package de.miraculixx.ghg_bot.commands
 
+import de.miraculixx.ghg_bot.JDA
+import de.miraculixx.ghg_bot.Main
+import de.miraculixx.ghg_bot.utils.cache.guildGHG
 import de.miraculixx.ghg_bot.utils.entities.SlashCommandEvent
+import de.miraculixx.ghg_bot.utils.extensions.json
 import de.miraculixx.ghg_bot.utils.log.noGuild
+import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.interactions.components.*
 import dev.minn.jda.ktx.messages.Embed
+import dev.minn.jda.ktx.messages.editMessage
+import dev.minn.jda.ktx.messages.editMessage_
 import dev.minn.jda.ktx.messages.reply_
 import dev.minn.jda.ktx.messages.send
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.entities.UserSnowflake
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
+import net.dv8tion.jda.api.interactions.InteractionHook
 import net.dv8tion.jda.api.interactions.components.ActionRow
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu
+import net.dv8tion.jda.api.requests.Route
+import net.dv8tion.jda.internal.requests.RestActionImpl
+import java.io.File
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.seconds
 
 class AdminCommand : SlashCommandEvent {
+
     override suspend fun trigger(it: SlashCommandInteractionEvent) {
         if (it.guild == null) {
             it.reply_(noGuild).queue()
@@ -66,6 +101,118 @@ class AdminCommand : SlashCommandEvent {
                         )
                     )
                 ).queue()
+            }
+
+            "prune-sus-member" -> {
+                val msg = it.reply_("Searching for sussy members...").await()
+                val response = Main.ktorClient.post("https://discord.com/api/v9/guilds/484676017513037844/members-search") {
+                    header("Authorization", JDA.token)
+                    header("Content-Type", "application/json")
+                    setBody("{\"or_query\": {   \"safety_signals\": {    \"unusual_account_activity\":true   }  },  \"and_query\":{},  \"limit\":1000 }")
+                }
+                println("Response: ${response.status.value} - ${response.status.description} (${JDA.token})")
+                val rawResp = response.bodyAsText()
+                println(rawResp.take(100) + "...")
+                val susMembers = try {
+                    json.decodeFromString<UserLookUp>(rawResp)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    msg.editMessage(content = "Failed to parse response: ${e.message}").queue()
+                    return
+                }
+
+                println("Parsed ${susMembers.members.size} members with sussy signals.")
+                val first = susMembers.members.firstOrNull()
+                val last = susMembers.members.lastOrNull()
+                if (first == null || last == null) {
+                    msg.editMessage(content = "No sussy members found.").queue()
+                    return
+                }
+
+                val accept = JDA.button(label = "Confirm", style = ButtonStyle.SUCCESS) { b ->
+                    try {
+                        b.editMessage("Pruning ${susMembers.members.size} sussy members...").setActionRow(b.button.asDisabled()).queue()
+                        val members = guildGHG.loadMembers().await()
+                        println("Loaded ${members.size} members from the guild.")
+                        val users = susMembers.members.mapNotNull {
+                            try {
+                                println("Retrieving member: ${it.member.user.id} (${it.member.user.username})")
+                                guildGHG.getMemberById(it.member.user.id) ?: guildGHG.retrieveMember(UserSnowflake.fromId(it.member.user.id)).await()
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                null
+                            }
+                        }
+                        pruneMembers(users, msg)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        msg.editMessage(content = "Failed to retrieve members: ${e.message}").queue()
+                        return@button
+                    }
+                }
+                println("Edit message")
+                msg.editMessage(content = "Found ${susMembers.members.size} sussy members.\n- From: <@${first.member.user.id}> (${first.member.joined_at})\n- To: <@${last.member.user.id}> (${last.member.joined_at})", components = listOf(
+                    ActionRow.of(accept))).queue()
+            }
+        }
+    }
+
+    private suspend fun pruneMembers(members: List<Member>, event: InteractionHook) = coroutineScope {
+        val total = members.size
+        val count = AtomicInteger(0)
+        val embed = Embed {
+            title = "<:ghg:1059233059532197979> || Potentieller Spam Entdeckt"
+            description = "Dein Account wurde als **potentieller Spam Account** erkannt und wird temporär von dem BastiGHG-Server entfernt. \n\n" +
+                    "> Solltest du kein Spam Account sein ändere bitte umgehend dein __**Passwort**__ und aktiviere __**2FA**__!\n\n" +
+                    "Dein Account wird in **1 Stunde** automatisch entsperrt, danach kannst du dem Server wieder beitreten. " +
+                    "Sollte du nicht automatisch entsperrt werden, erstelle einen Antrag auf https://appeal.gg/ghg"
+            color = 0xff0000
+        }
+
+        println("Start pruning ${members.size} members...")
+        val snowflakes = members.map { UserSnowflake.fromId(it.user.id) }
+        println("Snowflakes: ${snowflakes.size} members")
+        try {
+            File("prune_sus_members.json").writeText(json.encodeToString(members.map { it.id }))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return@coroutineScope
+        }
+        launch {
+            while (count.get() < total) {
+                println("Temporary pruning: ${count.get()} / $total")
+                event.editMessage(
+                    content = "Pruning **${count.get()} / $total** sussy members..."
+                ).queue()
+                delay(3.seconds)
+            }
+            event.editMessage(content = "Pruning complete! ($total member)\nThey can join in 1h again").queue()
+
+            CoroutineScope(Dispatchers.Default).launch {
+                delay(1.hours)
+                snowflakes.forEach { runCatching {
+                    guildGHG.unban(it).queue()
+                    println("Unbanned ${it.id}")
+                } }
+            }
+
+            return@launch
+        }
+
+        // execute for each member
+        members.map { member ->
+            launch {
+                try {
+                    member.user.openPrivateChannel().flatMap { channel ->
+                        channel.send("https://discord.gg/ghg", embeds = listOf(embed))
+                    }.await()
+                    val id = member.id
+                    member.ban(1, TimeUnit.SECONDS).await()
+                    println("Banned $id")
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                count.incrementAndGet()
             }
         }
     }
@@ -123,4 +270,27 @@ class AdminCommand : SlashCommandEvent {
             option("Sonstiges", "SONSTIGES", "Anliegen ausserhalb der oberen Themen", Emoji.fromFormatted("❔"))
         }
     }
+
+    @Serializable
+    private data class UserLookUp(
+        val guild_id: String,
+        val members: List<MemberObject>
+    )
+
+    @Serializable
+    private data class MemberObject(
+        val member: MemberObjectDirect
+    )
+
+    @Serializable
+    private data class MemberObjectDirect(
+        val joined_at: String,
+        val user: UserObject
+    )
+
+    @Serializable
+    private data class UserObject(
+        val id: String,
+        val username: String
+    )
 }

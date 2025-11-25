@@ -1,6 +1,7 @@
 package de.miraculixx.ghg_bot.modules.auto_support
 
 import de.miraculixx.ghg_bot.JDA
+import de.miraculixx.ghg_bot.commands.HelpCommand
 import de.miraculixx.ghg_bot.config.ConfigManager
 import de.miraculixx.ghg_bot.config.Configs
 import de.miraculixx.ghg_bot.utils.entities.EventListener
@@ -11,9 +12,18 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 
 class TabCompleteEvent: EventListener {
     override val listener: CoroutineEventListener = JDA.listener<CommandAutoCompleteInteractionEvent> {
-        if (it.name != "auto-support") return@listener
-        val filter = it.getOption("filter")?.asString ?: return@listener
-        val regexList = ConfigManager.regex[enumOf(filter)] ?: return@listener
-        it.replyChoiceStrings(regexList).queue()
+
+        when (it.name) {
+            "auto-support" -> {
+                val filter = it.getOption("filter")?.asString ?: return@listener
+                val regexList = ConfigManager.regex[enumOf(filter)] ?: return@listener
+                it.replyChoiceStrings(regexList).queue()
+            }
+
+            "support" -> {
+                if (it.focusedOption.name != "name") return@listener
+                it.replyChoiceStrings(HelpCommand.presets.keys).queue()
+            }
+        }
     }
 }

@@ -36,7 +36,7 @@ class TicketDropDownHandler : DropDownEvent {
                 "> Zweit Accounts sind verboten! Sollte dein Hauptaccount gesperrt worden sein, ist die Nutzung dieses aktuellen Accounts verboten! Wir überprüfen dies Regelmäßig."
         color = 0xcc0000
     }
-    private val unbanButton = button("https://forms.gle/e6c7cuW3ZvrYAGky8", "Unban Formular", Emoji.fromFormatted("\uD83D\uDD13"), ButtonStyle.LINK)
+    private val unbanButton = button("https://appeal.gg/ghg", "Unban Formular", Emoji.fromFormatted("\uD83D\uDD13"), ButtonStyle.LINK)
 
     override suspend fun trigger(it: GenericSelectMenuInteractionEvent<String, StringSelectMenu>) {
         val selected = it.values.firstOrNull()

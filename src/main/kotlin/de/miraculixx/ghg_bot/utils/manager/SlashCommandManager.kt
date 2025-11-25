@@ -21,7 +21,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands
 object SlashCommandManager {
     private val commands = mapOf(
         "auto-support" to AutoModCommand(),
-        "support" to HelpCommand(),
+        "support" to HelpCommand,
         "admin" to AdminCommand(),
         "just-google" to LetMeGoogleCommand(),
         "warnings" to WarnCommand(),
@@ -92,15 +92,29 @@ object SlashCommandManager {
                     }
                     option<String>("key", "Was entfernt werden soll", true, true)
                 }
+                subcommand("send", "Sende manuell eine Support Nachricht") {
+                    option<String>("type", "Welche Support Nachricht?", true) {
+                        HelpCommand.presets.keys.forEach { preset ->
+                            choice(preset, preset)
+                        }
+                    }
+                    option<Member>("ping", "Pinge einen User")
+                }
             },
             Command("support", "Sende eine Support Nachricht") {
-                defaultPermissions = DefaultMemberPermissions.DISABLED
-                option<String>("type", "Welche Support Nachricht?", true) {
-                    SupportFilter.entries.forEach { filter ->
-                        choice(filter.name, filter.name)
-                    }
+                subcommand("send", "Sende eine Support Nachricht") {
+                    option<String>("name", "Welches Preset?", true, true)
+                    option<Member>("ping", "Pinge einen User", false)
                 }
-                option<Member>("ping", "Pinge einen User")
+
+                subcommand("new", "Erstelle ein neues Support Preset") {
+                    option<String>("name", "Name des Presets", true)
+                    option<String>("id", "ID der Nachricht", true)
+                }
+
+                subcommand("remove", "Entferne ein Support Preset") {
+                    option<String>("name", "Welches Preset?", true, true)
+                }
             },
             Command("admin", "Bearbeite Tickets") {
                 subcommand("create-ticket-panel", "Erstelle den Ticket Entrypoint") {
@@ -118,11 +132,9 @@ object SlashCommandManager {
                 subcommand("vote-info", "Printe vote info") {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
                 }
-            },
-            Command("just-google", "Erzeugt einen Let-Me-Google-That Link") {
-                defaultPermissions = DefaultMemberPermissions.DISABLED
-                option<String>("prompt", "Was soll gegoogelt werden", true)
-                addOption(OptionType.USER, "ping", "Wer soll gepingt werden", false)
+                subcommand("prune-sus-member", "Prune users with sus signal") {
+                    defaultPermissions = DefaultMemberPermissions.DISABLED
+                }
             },
             Command("warnings", "Verwalte Warnungen") {
                 subcommand("amount", "Erhalte die Menge an Warnungen") {

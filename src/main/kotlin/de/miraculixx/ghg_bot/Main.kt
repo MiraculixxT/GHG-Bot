@@ -1,5 +1,6 @@
 package de.miraculixx.ghg_bot
 
+import de.miraculixx.ghg_bot.commands.HelpCommand
 import de.miraculixx.ghg_bot.config.ConfigManager
 import de.miraculixx.ghg_bot.modules.auto_support.AutoSupportMessages
 import de.miraculixx.ghg_bot.modules.auto_support.AutoSupportReactions
@@ -13,6 +14,7 @@ import de.miraculixx.ghg_bot.modules.other.StickyMessage
 import de.miraculixx.ghg_bot.modules.tickets.TicketMessages
 import de.miraculixx.ghg_bot.modules.user_moderation.UserModerationManager
 import de.miraculixx.ghg_bot.modules.voice.AlwaysOneFree
+import de.miraculixx.ghg_bot.utils.cache.guildGHG
 import de.miraculixx.ghg_bot.utils.log.Color
 import de.miraculixx.ghg_bot.utils.log.consoleChannel
 import de.miraculixx.ghg_bot.utils.log.log
@@ -22,6 +24,8 @@ import de.miraculixx.ghg_bot.utils.manager.ModalManager
 import de.miraculixx.ghg_bot.utils.manager.SlashCommandManager
 import dev.minn.jda.ktx.jdabuilder.default
 import dev.minn.jda.ktx.jdabuilder.intents
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.OnlineStatus
@@ -37,6 +41,7 @@ fun main() {
 class Main {
     companion object {
         lateinit var JDA: JDA
+        val ktorClient = HttpClient(CIO)
     }
 
     private fun command() {
@@ -53,6 +58,7 @@ class Main {
                         CommandOnlyChannel.save()
                         MediaOnlyChannel.save()
                         StickyMessage.save()
+                        HelpCommand.save()
 
                         JDA.shardManager?.setStatus(OnlineStatus.OFFLINE)
                         JDA.shutdown()
@@ -66,6 +72,8 @@ class Main {
                         CommandOnlyChannel.save()
                         MediaOnlyChannel.save()
                         StickyMessage.save()
+
+                        HelpCommand.save()
 
                         println("Configs saved!")
                     }
@@ -90,7 +98,7 @@ class Main {
             setStatus(OnlineStatus.IDLE)
             intents += listOf(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_VOICE_STATES)
             intents -= listOf(GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_MESSAGE_TYPING)
-            setMemberCachePolicy(MemberCachePolicy.DEFAULT)
+            setMemberCachePolicy(MemberCachePolicy.ALL)
         }
         JDA.awaitReady()
         consoleChannel = JDA.getTextChannelById(1036256164284997773)!!
