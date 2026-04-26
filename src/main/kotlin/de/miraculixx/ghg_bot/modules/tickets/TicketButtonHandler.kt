@@ -2,8 +2,10 @@ package de.miraculixx.ghg_bot.modules.tickets
 
 import de.miraculixx.ghg_bot.utils.cache.*
 import de.miraculixx.ghg_bot.utils.entities.ButtonEvent
+import dev.minn.jda.ktx.interactions.components.TextInput
 import dev.minn.jda.ktx.interactions.components.replyModal
 import dev.minn.jda.ktx.messages.Embed
+import net.dv8tion.jda.api.components.textinput.TextInputStyle
 import dev.minn.jda.ktx.messages.editMessage
 import dev.minn.jda.ktx.messages.send
 import kotlinx.coroutines.CoroutineScope
@@ -23,13 +25,22 @@ class TicketButtonHandler : ButtonEvent {
 
         when (it.componentId) {
             "TICKET-REPORT" -> it.replyModal("TICKET-REPORT", "Nutzer Melden") {
-                short("TAG", "Nutzer Tag", true, null, member.user.asTag) {
-                    minLength = 6
+                label("Nutzer Tag") {
+                    child = TextInput("TAG", TextInputStyle.SHORT, placeholder = member.user.asTag) {
+                        required = true
+                        requiredLength = 6..100
+                    }
                 }
-                short("ID", "Nutzer ID", false, null, member.id, 17..20)
-                paragraph("CONTENT", "Grund", true, null, "Warum möchtest du den Nutzer melden?") {
-                    minLength = 50
-                    maxLength = 2000
+                label("Nutzer ID") {
+                    child = TextInput("ID", TextInputStyle.SHORT, placeholder = member.id, requiredLength = 17..20) {
+                        required = false
+                    }
+                }
+                label("Grund") {
+                    child = TextInput("CONTENT", TextInputStyle.PARAGRAPH, placeholder = "Warum möchtest du den Nutzer melden?") {
+                        required = true
+                        requiredLength = 50..2000
+                    }
                 }
             }.queue()
 

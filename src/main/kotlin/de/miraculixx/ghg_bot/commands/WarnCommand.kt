@@ -3,8 +3,10 @@ package de.miraculixx.ghg_bot.commands
 import de.miraculixx.ghg_bot.modules.moderation.Warnings
 import de.miraculixx.ghg_bot.utils.entities.SlashCommandEvent
 import de.miraculixx.ghg_bot.utils.log.noGuild
+import dev.minn.jda.ktx.interactions.components.TextInput
 import dev.minn.jda.ktx.interactions.components.replyModal
 import dev.minn.jda.ktx.messages.reply_
+import net.dv8tion.jda.api.components.textinput.TextInputStyle
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent
 import kotlin.time.toKotlinDuration
@@ -42,7 +44,11 @@ class WarnCommand: SlashCommandEvent {
 
     override suspend fun triggerUserApp(it: UserContextInteractionEvent) {
         it.replyModal("WARN:${it.targetMember?.id}", "Warn User") {
-            paragraph("reason", "Reason", true)
+            label("Reason") {
+                child = TextInput("reason", TextInputStyle.PARAGRAPH) {
+                    required = true
+                }
+            }
         }.queue()
     }
 }

@@ -3,6 +3,7 @@ package de.miraculixx.ghg_bot.modules.tickets
 import de.miraculixx.ghg_bot.utils.cache.embedAd
 import de.miraculixx.ghg_bot.utils.cache.embedApplication
 import de.miraculixx.ghg_bot.utils.entities.DropDownEvent
+import dev.minn.jda.ktx.interactions.components.TextInput
 import dev.minn.jda.ktx.interactions.components.button
 import dev.minn.jda.ktx.interactions.components.replyModal
 import dev.minn.jda.ktx.messages.Embed
@@ -10,6 +11,7 @@ import dev.minn.jda.ktx.messages.reply_
 import net.dv8tion.jda.api.components.actionrow.ActionRow
 import net.dv8tion.jda.api.components.buttons.ButtonStyle
 import net.dv8tion.jda.api.components.selections.StringSelectMenu
+import net.dv8tion.jda.api.components.textinput.TextInputStyle
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.component.GenericSelectMenuInteractionEvent
 
@@ -47,9 +49,11 @@ class TicketDropDownHandler : DropDownEvent {
             "MELDEN" -> it.reply_(embeds = listOf(reportInfo), components = listOf(ActionRow.of(reportButton)), ephemeral = true).queue()
             "UNBAN" -> it.reply_(embeds = listOf(unbanInfo), components = listOf(ActionRow.of(unbanButton)), ephemeral = true).queue()
             "SONSTIGES" -> it.replyModal("TICKET-OTHER", "Neues Ticket") {
-                paragraph("CONTENT", "Deine Nachricht", true, null, "Mit dieser Nachricht beginnt das Ticket") {
-                    minLength = 50
-                    maxLength = 2000
+                label("Deine Nachricht") {
+                    child = TextInput("CONTENT", TextInputStyle.PARAGRAPH, placeholder = "Mit dieser Nachricht beginnt das Ticket") {
+                        required = true
+                        requiredLength = 50..2000
+                    }
                 }
             }.queue()
         }

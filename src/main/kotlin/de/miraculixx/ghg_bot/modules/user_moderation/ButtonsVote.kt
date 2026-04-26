@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 
 class ButtonsVote : ButtonEvent {
     override suspend fun trigger(it: ButtonInteractionEvent) {
-        val data = it.button.id?.split(":") ?: return
+        val data = it.button.customId?.split(":") ?: return
         val reportID = data.getOrNull(2)?.toUUID() ?: return
         val report = UserModerationManager.cases[reportID] ?: return
 

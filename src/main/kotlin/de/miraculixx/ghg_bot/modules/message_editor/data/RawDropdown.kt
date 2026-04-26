@@ -32,7 +32,7 @@ data class RawDropdownRoles(
     val minValues: Int = 1,
     val placeholder: String? = null,
 ) {
-    val a = EntitySelectMenu("id", setOf(net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu.SelectTarget.ROLE)) {
+    val a = EntitySelectMenu("id", setOf(net.dv8tion.jda.api.components.selections.EntitySelectMenu.SelectTarget.ROLE)) {
         this.setChannelTypes(ChannelType.VOICE)
     }
 }

@@ -3,8 +3,10 @@ package de.miraculixx.ghg_bot.commands
 import de.miraculixx.ghg_bot.modules.user_moderation.MessageReport
 import de.miraculixx.ghg_bot.modules.user_moderation.UserModerationManager
 import de.miraculixx.ghg_bot.utils.entities.SlashCommandEvent
+import dev.minn.jda.ktx.interactions.components.TextInput
 import dev.minn.jda.ktx.interactions.components.replyModal
 import dev.minn.jda.ktx.messages.reply_
+import net.dv8tion.jda.api.components.textinput.TextInputStyle
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent
@@ -32,8 +34,11 @@ class ReportCommand : SlashCommandEvent {
         }
 
         it.replyModal("REPORT:MESSAGE:${report.uuid}", "Nachricht Melden") {
-            paragraph("REASON", "Grund", true, placeholder = "Warum möchtest du die Nachricht melden?") {
-                minLength = 15
+            label("Grund") {
+                child = TextInput("REASON", TextInputStyle.PARAGRAPH, placeholder = "Warum möchtest du die Nachricht melden?") {
+                    required = true
+                    requiredLength = 15..4000
+                }
             }
         }.queue()
     }
@@ -41,12 +46,22 @@ class ReportCommand : SlashCommandEvent {
     override suspend fun triggerUserApp(it: UserContextInteractionEvent) {
         val target = it.interaction.targetMember ?: return
         it.replyModal("TICKET-REPORT", "Nutzer Melden") {
-            short("TAG", "Nutzer Tag", true, target.user.asTag) {
-                minLength = 6
+            label("Nutzer Tag") {
+                child = TextInput("TAG", TextInputStyle.SHORT, value = target.user.asTag) {
+                    required = true
+                    requiredLength = 6..100
+                }
             }
-            short("ID", "Nutzer ID", true, target.id, null, 17..20)
-            paragraph("CONTENT", "Grund", true, null, "Warum möchtest du den Nutzer melden?") {
-                minLength = 50
+            label("Nutzer ID") {
+                child = TextInput("ID", TextInputStyle.SHORT, value = target.id, requiredLength = 17..20) {
+                    required = true
+                }
+            }
+            label("Grund") {
+                child = TextInput("CONTENT", TextInputStyle.PARAGRAPH, placeholder = "Warum möchtest du den Nutzer melden?") {
+                    required = true
+                    requiredLength = 50..4000
+                }
             }
         }.queue()
     }

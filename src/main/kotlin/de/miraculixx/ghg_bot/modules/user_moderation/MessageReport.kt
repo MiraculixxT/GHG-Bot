@@ -2,7 +2,6 @@ package de.miraculixx.ghg_bot.modules.user_moderation
 
 import club.minnced.discord.webhook.send.WebhookMessageBuilder
 import de.miraculixx.ghg_bot.utils.extensions.mentionlessContent
-import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.interactions.components.danger
 import dev.minn.jda.ktx.interactions.components.success
 import dev.minn.jda.ktx.messages.Embed
@@ -15,8 +14,9 @@ import kotlinx.serialization.json.Json
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
+import net.dv8tion.jda.api.components.actionrow.ActionRow
 import net.dv8tion.jda.api.interactions.InteractionHook
-import net.dv8tion.jda.api.interactions.components.ActionRow
+import kotlinx.coroutines.future.await as awaitFuture
 import java.util.*
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
@@ -83,7 +83,7 @@ data class MessageReport(
                 setUsername("Verdächtiger")
                 setAvatarUrl(UserModerationManager.iconGuilty)
                 message.attachments.forEach { attachment ->
-                    addFile(attachment.fileName, attachment.proxy.download().await())
+                    addFile(attachment.fileName, attachment.proxy.download().awaitFuture())
                 }
             }.build()
         )
