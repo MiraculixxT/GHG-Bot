@@ -7,11 +7,11 @@ import dev.minn.jda.ktx.interactions.components.button
 import dev.minn.jda.ktx.interactions.components.replyModal
 import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.reply_
+import net.dv8tion.jda.api.components.actionrow.ActionRow
+import net.dv8tion.jda.api.components.buttons.ButtonStyle
+import net.dv8tion.jda.api.components.selections.StringSelectMenu
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.component.GenericSelectMenuInteractionEvent
-import net.dv8tion.jda.api.interactions.components.ActionRow
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu
 
 class TicketDropDownHandler : DropDownEvent {
     private val reportInfo = Embed {
@@ -25,7 +25,7 @@ class TicketDropDownHandler : DropDownEvent {
                 "Klicke auf den **roten Knopf** unter dieser Nachricht, um einen Nutzer zu melden!"
         color = 0xcc0000
     }
-    private val reportButton = button("TICKET-REPORT", "Nutzer Melden", Emoji.fromFormatted("\uD83D\uDD28"), ButtonStyle.DANGER)
+    private val reportButton = button("TICKET-REPORT", "Nutzer Melden", Emoji.fromFormatted("\uD83D\uDD28"), style = ButtonStyle.DANGER)
 
     private val unbanInfo = Embed {
         title = "Unban Request"
@@ -36,7 +36,7 @@ class TicketDropDownHandler : DropDownEvent {
                 "> Zweit Accounts sind verboten! Sollte dein Hauptaccount gesperrt worden sein, ist die Nutzung dieses aktuellen Accounts verboten! Wir überprüfen dies Regelmäßig."
         color = 0xcc0000
     }
-    private val unbanButton = button("https://appeal.gg/ghg", "Unban Formular", Emoji.fromFormatted("\uD83D\uDD13"), ButtonStyle.LINK)
+    private val unbanButton = button("https://appeal.gg/ghg", "Unban Formular", Emoji.fromFormatted("\uD83D\uDD13"), style = ButtonStyle.LINK)
 
     override suspend fun trigger(it: GenericSelectMenuInteractionEvent<String, StringSelectMenu>) {
         val selected = it.values.firstOrNull()

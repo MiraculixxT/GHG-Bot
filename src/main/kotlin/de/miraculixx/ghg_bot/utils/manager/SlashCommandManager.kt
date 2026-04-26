@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent
+import net.dv8tion.jda.api.interactions.InteractionContextType
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
@@ -187,9 +188,9 @@ object SlashCommandManager {
             *streamCommands.map {
                 Command(it, "Informationen über Basti's $it")
             }.toTypedArray(),
-            Commands.user("Melde Nutzer").setGuildOnly(true),
-            Commands.message("Melde Nachricht").setGuildOnly(true),
-            Commands.user("warnings").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.DISABLED),
+            Commands.user("Melde Nutzer").setContexts(InteractionContextType.GUILD),
+            Commands.message("Melde Nachricht").setContexts(InteractionContextType.GUILD),
+            Commands.user("warnings").setContexts(InteractionContextType.GUILD).setDefaultPermissions(DefaultMemberPermissions.DISABLED),
         ).queue()
     }
 }

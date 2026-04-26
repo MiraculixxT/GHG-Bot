@@ -8,13 +8,13 @@ import de.miraculixx.ghg_bot.modules.auto_support.TabCompleteEvent
 import de.miraculixx.ghg_bot.modules.moderation.SpamCheck
 import de.miraculixx.ghg_bot.modules.moderation.Warnings
 import de.miraculixx.ghg_bot.modules.other.CommandOnlyChannel
+import de.miraculixx.ghg_bot.modules.other.FanartHighlighting
 import de.miraculixx.ghg_bot.modules.other.MediaOnlyChannel
 import de.miraculixx.ghg_bot.modules.other.ThreadChannel
 import de.miraculixx.ghg_bot.modules.other.StickyMessage
 import de.miraculixx.ghg_bot.modules.tickets.TicketMessages
 import de.miraculixx.ghg_bot.modules.user_moderation.UserModerationManager
 import de.miraculixx.ghg_bot.modules.voice.AlwaysOneFree
-import de.miraculixx.ghg_bot.utils.cache.guildGHG
 import de.miraculixx.ghg_bot.utils.log.Color
 import de.miraculixx.ghg_bot.utils.log.consoleChannel
 import de.miraculixx.ghg_bot.utils.log.log
@@ -119,6 +119,7 @@ class Main {
         SpamCheck()
 
         StickyMessage
+        FanartHighlighting
 
         "GHG Bot is now online!".log(Color.GREEN)
 

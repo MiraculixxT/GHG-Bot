@@ -10,39 +10,23 @@ import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.interactions.components.*
 import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.editMessage
-import dev.minn.jda.ktx.messages.editMessage_
 import dev.minn.jda.ktx.messages.reply_
 import dev.minn.jda.ktx.messages.send
-import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
+import net.dv8tion.jda.api.components.actionrow.ActionRow
+import net.dv8tion.jda.api.components.buttons.Button
+import net.dv8tion.jda.api.components.buttons.ButtonStyle
+import net.dv8tion.jda.api.components.selections.StringSelectMenu
 import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
-import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.UserSnowflake
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.interactions.InteractionHook
-import net.dv8tion.jda.api.interactions.components.ActionRow
-import net.dv8tion.jda.api.interactions.components.buttons.Button
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu
-import net.dv8tion.jda.api.requests.Route
-import net.dv8tion.jda.internal.requests.RestActionImpl
 import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
@@ -73,7 +57,8 @@ class AdminCommand : SlashCommandEvent {
 
             "timeout-selection" -> {
                 val timeoutData = getTimeoutSelection()
-                it.reply_(embeds = listOf(timeoutData.first), components = listOf(ActionRow.of(timeoutData.second))).queue()
+                it.reply_(embeds = listOf(timeoutData.first), components = listOf(ActionRow.of(timeoutData.second)))
+                    .queue()
             }
 
             "clear-threads" -> {
@@ -94,7 +79,8 @@ class AdminCommand : SlashCommandEvent {
                             "\n" +
                             "Wenn du konsequent korrekt und zuverlässig votest, baust du Vertrauen auf. Vertrauenswürdige Mitglieder haben die Möglichkeit, eine größere Rolle bei Entscheidungen zu spielen und helfen, den Server für alle angenehm zu gestalten <:PeepoGlad:1062106500056743947> \n" +
                             "\n" +
-                            "*Dieses System ist noch in der Beta, bei Fragen oder Problemen bitte an <@341998118574751745> wenden*", components = listOf(
+                            "*Dieses System ist noch in der Beta, bei Fragen oder Problemen bitte an <@341998118574751745> wenden*",
+                    components = listOf(
                         ActionRow.of(
                             success("REPORT-ADMIN:OPTIN", "Teilnehmen"),
                             secondary("REPORT-ADMIN:POINTS", "Erhaltene Punkte")
@@ -105,11 +91,12 @@ class AdminCommand : SlashCommandEvent {
 
             "prune-sus-member" -> {
                 val msg = it.reply_("Searching for sussy members...").await()
-                val response = Main.ktorClient.post("https://discord.com/api/v9/guilds/484676017513037844/members-search") {
-                    header("Authorization", JDA.token)
-                    header("Content-Type", "application/json")
-                    setBody("{\"or_query\": {   \"safety_signals\": {    \"unusual_account_activity\":true   }  },  \"and_query\":{},  \"limit\":1000 }")
-                }
+                val response =
+                    Main.ktorClient.post("https://discord.com/api/v9/guilds/484676017513037844/members-search") {
+                        header("Authorization", JDA.token)
+                        header("Content-Type", "application/json")
+                        setBody("{\"or_query\": {   \"safety_signals\": {    \"unusual_account_activity\":true   }  },  \"and_query\":{},  \"limit\":1000 }")
+                    }
                 println("Response: ${response.status.value} - ${response.status.description} (${JDA.token})")
                 val rawResp = response.bodyAsText()
                 println(rawResp.take(100) + "...")
@@ -131,13 +118,15 @@ class AdminCommand : SlashCommandEvent {
 
                 val accept = JDA.button(label = "Confirm", style = ButtonStyle.SUCCESS) { b ->
                     try {
-                        b.editMessage("Pruning ${susMembers.members.size} sussy members...").setActionRow(b.button.asDisabled()).queue()
+                        b.editMessage("Pruning ${susMembers.members.size} sussy members...")
+                            .setComponents(ActionRow.of(b.button.asDisabled())).queue()
                         val members = guildGHG.loadMembers().await()
                         println("Loaded ${members.size} members from the guild.")
                         val users = susMembers.members.mapNotNull {
                             try {
                                 println("Retrieving member: ${it.member.user.id} (${it.member.user.username})")
-                                guildGHG.getMemberById(it.member.user.id) ?: guildGHG.retrieveMember(UserSnowflake.fromId(it.member.user.id)).await()
+                                guildGHG.getMemberById(it.member.user.id)
+                                    ?: guildGHG.retrieveMember(UserSnowflake.fromId(it.member.user.id)).await()
                             } catch (e: Exception) {
                                 e.printStackTrace()
                                 null
@@ -151,8 +140,12 @@ class AdminCommand : SlashCommandEvent {
                     }
                 }
                 println("Edit message")
-                msg.editMessage(content = "Found ${susMembers.members.size} sussy members.\n- From: <@${first.member.user.id}> (${first.member.joined_at})\n- To: <@${last.member.user.id}> (${last.member.joined_at})", components = listOf(
-                    ActionRow.of(accept))).queue()
+                msg.editMessage(
+                    content = "Found ${susMembers.members.size} sussy members.\n- From: <@${first.member.user.id}> (${first.member.joined_at})\n- To: <@${last.member.user.id}> (${last.member.joined_at})",
+                    components = listOf(
+                        ActionRow.of(accept)
+                    )
+                ).queue()
             }
         }
     }
@@ -162,10 +155,11 @@ class AdminCommand : SlashCommandEvent {
         val count = AtomicInteger(0)
         val embed = Embed {
             title = "<:ghg:1059233059532197979> || Potentieller Spam Entdeckt"
-            description = "Dein Account wurde als **potentieller Spam Account** erkannt und wird temporär von dem BastiGHG-Server entfernt. \n\n" +
-                    "> Solltest du kein Spam Account sein ändere bitte umgehend dein __**Passwort**__ und aktiviere __**2FA**__!\n\n" +
-                    "Dein Account wird in **1 Stunde** automatisch entsperrt, danach kannst du dem Server wieder beitreten. " +
-                    "Sollte du nicht automatisch entsperrt werden, erstelle einen Antrag auf https://appeal.gg/ghg"
+            description =
+                "Dein Account wurde als **potentieller Spam Account** erkannt und wird temporär von dem BastiGHG-Server entfernt. \n\n" +
+                        "> Solltest du kein Spam Account sein ändere bitte umgehend dein __**Passwort**__ und aktiviere __**2FA**__!\n\n" +
+                        "Dein Account wird in **1 Stunde** automatisch entsperrt, danach kannst du dem Server wieder beitreten. " +
+                        "Sollte du nicht automatisch entsperrt werden, erstelle einen Antrag auf https://appeal.gg/ghg"
             color = 0xff0000
         }
 
@@ -190,10 +184,12 @@ class AdminCommand : SlashCommandEvent {
 
             CoroutineScope(Dispatchers.Default).launch {
                 delay(1.hours)
-                snowflakes.forEach { runCatching {
-                    guildGHG.unban(it).queue()
-                    println("Unbanned ${it.id}")
-                } }
+                snowflakes.forEach {
+                    runCatching {
+                        guildGHG.unban(it).queue()
+                        println("Unbanned ${it.id}")
+                    }
+                }
             }
 
             return@launch
@@ -220,8 +216,9 @@ class AdminCommand : SlashCommandEvent {
     private fun getTimeoutSelection(): Pair<MessageEmbed, List<Button>> {
         return Embed {
             title = "**Kostenlose Timeouts**"
-            description = "Hier kannst du dir deinen **kostenlosen** Timeout abholen! \nEinfach auf einen Button unten drücken, der dich am meisten interessiert. \n" +
-                    "Geschenke werden direkt und unwiderruflich ausgehändigt."
+            description =
+                "Hier kannst du dir deinen **kostenlosen** Timeout abholen! \nEinfach auf einen Button unten drücken, der dich am meisten interessiert. \n" +
+                        "Geschenke werden direkt und unwiderruflich ausgehändigt."
         } to listOf(
             button("TIMEOUT:1", "1h Timeout", style = ButtonStyle.DANGER),
             button("TIMEOUT:2", "1d Timeout", style = ButtonStyle.DANGER),
@@ -240,33 +237,49 @@ class AdminCommand : SlashCommandEvent {
                     "> <@&604279184038297620> -> YouTube **Zweitkanal** Videos\n" +
                     "> <@&604277191823589396> -> Twitch **Streams**"
             color = 0xb800ff
-        } to button("NOTIFY", "Einstellungen ändern", Emoji.fromFormatted("\uD83D\uDD14"), ButtonStyle.PRIMARY)
+        } to button("NOTIFY", "Einstellungen ändern", Emoji.fromFormatted("\uD83D\uDD14"), style = ButtonStyle.PRIMARY)
     }
 
     private fun getTicketPanel(): Pair<MessageEmbed, StringSelectMenu> {
         return Embed {
             title = "⁉️ ||  **Fragen und Meldungen**"
-            description = "Hier kannst du Tickets öffnen um dem Team private **Fragen** zu stellen oder **Nutzer melden**!\n" +
-                    "\n" +
-                    "**Nutzer melden**\n" +
-                    "> - Halte den Nutzer Tag (ID) bereit -> `name#0000`\n" +
-                    "> - Halte einen Beweis bereit -> Bilder oder Videos (nur `mp4`)\n" +
-                    "\n" +
-                    "**Achtung**\n" +
-                    "> Missbrauch des Ticketsystems wird zum **Ausschluss** gebracht!\n" +
-                    "> Wähle ein **passendes** Thema zu deinem Anliegen im unteren Menü aus um Hilfe zu erhalten.\n" +
-                    "\n" +
-                    "Bereit? Dann wähle ein Thema aus dem unteren Menü aus um ein neues Ticket zu öffnen!"
+            description =
+                "Hier kannst du Tickets öffnen um dem Team private **Fragen** zu stellen oder **Nutzer melden**!\n" +
+                        "\n" +
+                        "**Nutzer melden**\n" +
+                        "> - Halte den Nutzer Tag (ID) bereit -> `name#0000`\n" +
+                        "> - Halte einen Beweis bereit -> Bilder oder Videos (nur `mp4`)\n" +
+                        "\n" +
+                        "**Achtung**\n" +
+                        "> Missbrauch des Ticketsystems wird zum **Ausschluss** gebracht!\n" +
+                        "> Wähle ein **passendes** Thema zu deinem Anliegen im unteren Menü aus um Hilfe zu erhalten.\n" +
+                        "\n" +
+                        "Bereit? Dann wähle ein Thema aus dem unteren Menü aus um ein neues Ticket zu öffnen!"
             url = "https://discord.com/channels/484676017513037844/859833491251789844"
             color = 0xb800ff
         } to StringSelectMenu("TICKET") {
             placeholder = "Wähle ein Thema für dein Anliegen"
             maxValues = 1
             minValues = 1
-            option("DM Werbung", "WERBUNG", "Jegliche Werbung unbekannter Accounts in DMs", Emoji.fromFormatted("\uD83C\uDF9F️"))
+            option(
+                "DM Werbung",
+                "WERBUNG",
+                "Jegliche Werbung unbekannter Accounts in DMs",
+                Emoji.fromFormatted("\uD83C\uDF9F️")
+            )
             option("Bewerbung", "BEWERBUNG", "Bewerbungen für Twitch/Discord/Dev", Emoji.fromFormatted("\uD83D\uDEE1️"))
-            option("Nutzer melden", "MELDEN", "Melde Nutzer für Vergehen auf diesem Discord", Emoji.fromFormatted("\uD83D\uDD28"))
-            option("Unban Anfrage", "UNBAN", "Stelle eine unban Anfrage für einen Account", Emoji.fromFormatted("\uD83D\uDD13"))
+            option(
+                "Nutzer melden",
+                "MELDEN",
+                "Melde Nutzer für Vergehen auf diesem Discord",
+                Emoji.fromFormatted("\uD83D\uDD28")
+            )
+            option(
+                "Unban Anfrage",
+                "UNBAN",
+                "Stelle eine unban Anfrage für einen Account",
+                Emoji.fromFormatted("\uD83D\uDD13")
+            )
             option("Sonstiges", "SONSTIGES", "Anliegen ausserhalb der oberen Themen", Emoji.fromFormatted("❔"))
         }
     }

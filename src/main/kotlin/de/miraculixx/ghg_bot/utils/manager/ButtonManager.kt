@@ -19,7 +19,7 @@ object ButtonManager {
     )
 
     fun startListen(jda: JDA) = jda.listener<ButtonInteractionEvent> {
-        val id = it.button.id ?: return@listener
+        val id = it.button.customId ?: return@listener
         val commandClass = when {
             id.startsWith("TICKET-") -> buttons["TICKET"]
             id.startsWith("NOTIFY") -> buttons["NOTIFY"]
