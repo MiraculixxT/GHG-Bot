@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.components.actionrow.ActionRow
 import net.dv8tion.jda.api.components.buttons.ButtonStyle
+import net.dv8tion.jda.api.components.selections.EntitySelectMenu
 import net.dv8tion.jda.api.interactions.InteractionHook
 
 object TicketModalHandler : ModalEvent {
@@ -33,16 +34,45 @@ object TicketModalHandler : ModalEvent {
         val hook = it.hook
         val channel = it.channel
         if (channel !is TextChannel) return
+        println("Modal: ${it.modalId} by ${member.user.name} in channel ${channel.name}")
 
         when (it.modalId) {
-            "TICKET-REPORT" -> member.createTicket(TicketType.REPORT, message, hook, it.getValue("TAG")?.asString, it.getValue("ID")?.asString)
-            "TICKET-OTHER" -> member.createTicket(TicketType.OTHER, message, hook)
+            "TICKET-REPORT" -> {
+                val evidence = it.getValue("EVIDENCE")?.asStringList?.firstOrNull() == "YES"
+                if (!evidence) {
+                    println("No evidence provided for report by ${member.user.name}")
+                    hook.editMessage(content = "```diff\n- Ein Beweis wird benötigt!\n- Voice Channel: Video Aufnahme\n- Text/User: Screenshot```").queue()
+                    return
+                }
+                val reported = it.getValue("USER")?.asMentions?.members?.firstOrNull()
+                if (reported == null) {
+                    println("No user provided for report by ${member.user.name}")
+                    hook.editMessage(content = "```diff\n- Der Nutzer muss auf diesem Server sein, damit du ihn melden kannst!```").queue()
+                    return
+                }
+                val type = it.getValue("TYPE")?.asStringList?.firstOrNull() ?: "Nicht angegeben"
+                if (type == "SPAM") {
+                    println("User ${member.user.name} reported ${reported.user.name} for SPAM")
+                    hook.editMessage(content = "## Vielen Dank für die Meldung\n" +
+                            "Bitte melde den Nutzer ebenfalls an Discord als Spam/Scam, damit der Platform weit gesperrt werden kann.\n" +
+                            "Interagiere **nicht** mit solchen Accounts, diese sind meist nur Bots. Wechsel deine Anmeldedaten **sofort**, solltest du etwas weitergegeben haben!").queue()
+                    return
+                }
+                println("Create...")
+                member.createTicket(TicketType.REPORT, hook) { thread ->
+                    thread.setupReportTicket(member, reported, message, type)
+                }
+            }
+
+            "TICKET-OTHER" -> member.createTicket(TicketType.OTHER, hook) { thread ->
+                thread.setupOtherTicket(member, message)
+            }
 
             else -> hook.editMessage(content = "```diff\n- Ein Fehler ist aufgetreten! Bitte melde dies an einen Moderator```").queue()
         }
     }
 
-    fun Member.createTicket(type: TicketType, message: String, source: InteractionHook, tag: String? = null, id: String? = null) {
+    fun Member.createTicket(type: TicketType, source: InteractionHook, setup: (ThreadChannel) -> Unit) {
         CoroutineScope(Dispatchers.Default).launch {
             val thread = reportChannel.createThreadChannel(type.prefix + user.name, true)
                 .setInvitable(false).complete()
@@ -51,10 +81,7 @@ object TicketModalHandler : ModalEvent {
                 TicketType.REPORT -> ticketReportRole.asMention
             }
             thread.send("${ping}-${this@createTicket.id}-${this@createTicket.asMention}").complete()
-            when (type) {
-                TicketType.REPORT -> thread.setupReportTicket(this@createTicket, tag, id, message)
-                TicketType.OTHER -> thread.setupOtherTicket(this@createTicket, message)
-            }
+            setup(thread)
             source.editMessage(content = "", embeds = listOf(Embed {
                 title = "Neues Ticket"
                 description = "Dein erstelltes Ticket findest du hier: ${thread.asMention}\n" +
@@ -70,28 +97,26 @@ object TicketModalHandler : ModalEvent {
             description = "Willkommen **${opener.nickname ?: opener.user.name}**!\n" +
 
                     "\nHier kannst du **privat** mit dem Team in Kontakt treten. " +
-                    "Bitte schildere uns dein Anliegen so gut wie möglich, damit wir dir helfen können!" +
+                    "Bitte schildere uns dein Anliegen so gut wie möglich, damit wir dir helfen können!"
 
-                    "\n\n```fix\n- Je nach Zeitpunkt und Anfragen Menge kann es etwas dauern, bis wir dir antworten können." +
-                    "\n- Ein Missbrauch des Ticketsystems führt zum Ausschluss!```"
+            footer("Ein Missbrauch des Ticketsystems führt zum Ausschluss!", "https://cdn.discordapp.com/avatars/1036252236151537664/6d4c02fa02a172898a4e84e846b1a635")
             color = 0xb800ff
         }), components = listOf(ActionRow.of(buttonCloseOther))).queue()
         send(message).queue()
     }
 
-    private fun ThreadChannel.setupReportTicket(opener: Member, tag: String?, id: String?, message: String) {
+    private fun ThreadChannel.setupReportTicket(opener: Member, reported: Member, message: String, type: String) {
         send(embeds = listOf(Embed {
             title = "\uD83D\uDD28  || **Nutzer Melden**"
             description = "Willkommen **${opener.nickname ?: opener.user.name}**!\n" +
 
-                    "\nHier kannst du **Nutzer melden**, welche gegen unsere <#484677070522417162> verstoßen!\n" +
-                    "\n**__User Reports__**" +
-                    "\n> - Nutzer **Tag** -> `${tag ?: "Nicht angegeben"}`" +
-                    "\n> - Nutzer **ID** -> `${id?.ifBlank { "Nicht angegeben" } ?: "Nicht angegeben"}`" +
-                    "\n> - **Beweis** -> Bilder oder Videos (nur `mp4`)" +
-
-                    "\n\n```fix\n- Je nach Zeitpunkt und Anfragen Menge kann es etwas dauern, bis wir dir antworten können." +
-                    "\n- Ein Missbrauch des Ticketsystems führt zum Ausschluss!```"
+                    "\nÜbersicht deiner **Meldung** gegen ein anderen Nutzer." +
+                    "\nSende weitere Nachweise oder Information direkt hier rein!\n" +
+                    "\n## User Report" +
+                    "\n> ● **Nutzer** -> ${reported.asMention}" +
+                    "\n>  ‣ `${reported.user.name}` - `${reported.id}`" +
+                    "\n> ● **Type** -> ${type}"
+            footer("Ein Missbrauch des Ticketsystems führt zum Ausschluss!", "https://cdn.discordapp.com/avatars/1036252236151537664/6d4c02fa02a172898a4e84e846b1a635")
             color = 0xb800ff
         }), components = listOf(ActionRow.of(buttonCloseReport))).queue()
         send(message).queue()

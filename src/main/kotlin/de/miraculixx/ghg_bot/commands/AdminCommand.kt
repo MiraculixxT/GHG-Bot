@@ -262,9 +262,9 @@ class AdminCommand : SlashCommandEvent {
             maxValues = 1
             minValues = 1
             option(
-                "DM Werbung",
+                "DM Werbung / Scams",
                 "WERBUNG",
-                "Jegliche Werbung unbekannter Accounts in DMs",
+                "Jegliche Werbung oder Scams unbekannter Accounts in DMs",
                 Emoji.fromFormatted("\uD83C\uDF9F️")
             )
             option("Bewerbung", "BEWERBUNG", "Bewerbungen für Twitch/Discord/Dev", Emoji.fromFormatted("\uD83D\uDEE1️"))

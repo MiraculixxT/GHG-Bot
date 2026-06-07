@@ -11,6 +11,7 @@ import dev.minn.jda.ktx.interactions.commands.option
 import dev.minn.jda.ktx.interactions.commands.subcommand
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent
@@ -31,6 +32,7 @@ object SlashCommandManager {
         "reputation" to UserModerationCommand(),
         "message" to MessageCommand(),
         "channel" to ChannelCommand(),
+        "voice" to VoiceCommand,
     )
     private val streamCommands = setOf("tastatur", "maus", "socials", "merch", "monitor", "mauspad", "mc-settings", "pc-specs", "timolia")
 
@@ -183,6 +185,12 @@ object SlashCommandManager {
                 subcommand("media-only", "Toggle command only for current channel")
                 subcommand("sticky-message", "Setup a sticky message for this channel") {
                     option<String>("message", "Enter . to remove any message", true)
+                }
+            },
+            Command("voice", "...") {
+                defaultPermissions = DefaultMemberPermissions.DISABLED
+                subcommand("join", "Join") {
+                    option<VoiceChannel>("channel", "Channel", true)
                 }
             },
             *streamCommands.map {

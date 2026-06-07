@@ -27,8 +27,11 @@ import dev.minn.jda.ktx.jdabuilder.intents
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import kotlinx.coroutines.runBlocking
+import moe.kyokobot.libdave.NativeDaveFactory
+import moe.kyokobot.libdave.jda.LDJDADaveSessionFactory
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.OnlineStatus
+import net.dv8tion.jda.api.audio.AudioModuleConfig
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.utils.MemberCachePolicy
@@ -93,6 +96,11 @@ class Main {
     init {
         val dcToken = ConfigManager.credentials.dcToken
         JDA = default(dcToken) {
+            setAudioModuleConfig(
+                AudioModuleConfig().withDaveSessionFactory(
+                    LDJDADaveSessionFactory(NativeDaveFactory())
+                )
+            )
             enableCache(CacheFlag.VOICE_STATE)
             setActivity(Activity.watching("nach Fragen \uD83D\uDC40"))
             setStatus(OnlineStatus.IDLE)

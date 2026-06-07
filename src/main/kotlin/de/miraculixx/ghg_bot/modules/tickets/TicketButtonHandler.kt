@@ -24,26 +24,6 @@ class TicketButtonHandler : ButtonEvent {
         val member = it.member ?: return
 
         when (it.componentId) {
-            "TICKET-REPORT" -> it.replyModal("TICKET-REPORT", "Nutzer Melden") {
-                label("Nutzer Tag") {
-                    child = TextInput("TAG", TextInputStyle.SHORT, placeholder = member.user.asTag) {
-                        required = true
-                        requiredLength = 6..100
-                    }
-                }
-                label("Nutzer ID") {
-                    child = TextInput("ID", TextInputStyle.SHORT, placeholder = member.id, requiredLength = 17..20) {
-                        required = false
-                    }
-                }
-                label("Grund") {
-                    child = TextInput("CONTENT", TextInputStyle.PARAGRAPH, placeholder = "Warum möchtest du den Nutzer melden?") {
-                        required = true
-                        requiredLength = 50..2000
-                    }
-                }
-            }.queue()
-
             "TICKET-CLOSE" -> {
                 it.message.editMessageComponents().queue()
                 it.deferReply().queue()

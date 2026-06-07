@@ -18,9 +18,12 @@ kotlin {
 }
 
 dependencies {
-    implementation("net.dv8tion:JDA:6.4.1")
+    implementation("net.dv8tion:JDA:6.4.2")
     implementation("club.minnced:jda-ktx:0.14.2")
     implementation("club.minnced:discord-webhooks:0.8.4")
+    implementation("moe.kyokobot.libdave:adapter-jda:0.1.2")
+    implementation("moe.kyokobot.libdave:impl-jni:0.1.2")
+    implementation("moe.kyokobot.libdave:natives-linux-aarch64:0.1.2")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
@@ -28,8 +31,7 @@ dependencies {
     implementation("io.ktor:ktor-client-core-jvm:$ktor")
     implementation("io.ktor:ktor-client-cio:$ktor")
 
-    implementation("org.slf4j:slf4j-api:1.7.36")
-    implementation("org.slf4j:slf4j-simple:1.7.36")
+    runtimeOnly("org.slf4j:slf4j-simple:2.0.18")
 
     implementation("org.yaml:snakeyaml:2.0")
 }
@@ -41,7 +43,7 @@ application {
 tasks {
     jar {
         manifest {
-            attributes["Main-Class"] = "de.miraculixx.mcord_event.MainKt"
+            attributes["Main-Class"] = "de.miraculixx.ghg_bot.MainKt"
         }
     }
 }
