@@ -43,6 +43,7 @@ object HelpCommand : SlashCommandEvent {
                 val msg = it.channel.retrieveMessageById(msgID).await()
                 val content = msg.contentRaw
                 presets[name] = content
+                save()
                 it.reply_("Preset `$name` erfolgreich erstellt mit folgendem Inhalt!\n\n$content", ephemeral = true).queue()
             }
 
@@ -53,6 +54,7 @@ object HelpCommand : SlashCommandEvent {
                     it.reply_("Kein Preset mit dem Namen `$name` gefunden!", ephemeral = true).queue()
                     return
                 }
+                save()
                 it.reply_("Preset `$name` erfolgreich entfernt!", ephemeral = true).queue()
             }
         }

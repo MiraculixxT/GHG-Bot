@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent
 import net.dv8tion.jda.api.interactions.InteractionContextType
+import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
@@ -74,36 +75,29 @@ object SlashCommandManager {
                 defaultPermissions = DefaultMemberPermissions.DISABLED
                 subcommand("list", "Zeige alle Filter Events") {
                     option<String>("filter", "Welchen Filter?", true) {
-                        SupportFilter.entries.forEach { filter ->
-                            choice(filter.name, filter.name)
-                        }
+                        addChoices(SupportFilter.entries.map { Command.Choice(it.name, it.name) })
                     }
                 }
                 subcommand("add", "Füge ein neuen Filter hinzu") {
                     option<String>("filter", "Welchen Filter?", true) {
-                        SupportFilter.entries.forEach { filter ->
-                            choice(filter.name, filter.name)
-                        }
+                        addChoices(SupportFilter.entries.map { Command.Choice(it.name, it.name) })
                     }
                     option<String>("key", "Was hinzugefügt werden soll", true)
                 }
                 subcommand("remove", "Entferne einen aktuellen Filter") {
                     option<String>("filter", "Welchen Filter?", true) {
-                        SupportFilter.entries.forEach { filter ->
-                            choice(filter.name, filter.name)
-                        }
+                        addChoices(SupportFilter.entries.map { Command.Choice(it.name, it.name) })
                     }
                     option<String>("key", "Was entfernt werden soll", true, true)
                 }
                 subcommand("send", "Sende manuell eine Support Nachricht") {
                     option<String>("type", "Welche Support Nachricht?", true) {
-                        HelpCommand.presets.keys.forEach { preset ->
-                            choice(preset, preset)
-                        }
+                        addChoices(SupportFilter.entries.map { Command.Choice(it.name, it.name) })
                     }
                     option<Member>("ping", "Pinge einen User")
                 }
             },
+
             Command("support", "Sende eine Support Nachricht") {
                 subcommand("send", "Sende eine Support Nachricht") {
                     option<String>("name", "Welches Preset?", true, true)

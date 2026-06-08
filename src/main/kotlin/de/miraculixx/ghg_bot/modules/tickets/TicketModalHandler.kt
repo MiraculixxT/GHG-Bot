@@ -38,27 +38,23 @@ object TicketModalHandler : ModalEvent {
 
         when (it.modalId) {
             "TICKET-REPORT" -> {
-                val evidence = it.getValue("EVIDENCE")?.asStringList?.firstOrNull() == "YES"
-                if (!evidence) {
-                    println("No evidence provided for report by ${member.user.name}")
-                    hook.editMessage(content = "```diff\n- Ein Beweis wird benötigt!\n- Voice Channel: Video Aufnahme\n- Text/User: Screenshot```").queue()
-                    return
-                }
-                val reported = it.getValue("USER")?.asMentions?.members?.firstOrNull()
-                if (reported == null) {
-                    println("No user provided for report by ${member.user.name}")
-                    hook.editMessage(content = "```diff\n- Der Nutzer muss auf diesem Server sein, damit du ihn melden kannst!```").queue()
-                    return
-                }
                 val type = it.getValue("TYPE")?.asStringList?.firstOrNull() ?: "Nicht angegeben"
                 if (type == "SPAM") {
-                    println("User ${member.user.name} reported ${reported.user.name} for SPAM")
                     hook.editMessage(content = "## Vielen Dank für die Meldung\n" +
                             "Bitte melde den Nutzer ebenfalls an Discord als Spam/Scam, damit der Platform weit gesperrt werden kann.\n" +
                             "Interagiere **nicht** mit solchen Accounts, diese sind meist nur Bots. Wechsel deine Anmeldedaten **sofort**, solltest du etwas weitergegeben haben!").queue()
                     return
                 }
-                println("Create...")
+                val reported = it.getValue("USER")?.asMentions?.members?.firstOrNull()
+                if (reported == null) {
+                    hook.editMessage(content = "```diff\n- Der Nutzer muss auf diesem Server sein, damit du ihn melden kannst!```").queue()
+                    return
+                }
+                val evidence = it.getValue("EVIDENCE")?.asStringList?.firstOrNull() == "YES"
+                if (!evidence) {
+                    hook.editMessage(content = "```diff\n- Ein Beweis wird benötigt!\n- Voice Channel: Video Aufnahme\n- Text/User: Screenshot```").queue()
+                    return
+                }
                 member.createTicket(TicketType.REPORT, hook) { thread ->
                     thread.setupReportTicket(member, reported, message, type)
                 }
