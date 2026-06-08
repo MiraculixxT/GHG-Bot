@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.components.actionrow.ActionRow
 import net.dv8tion.jda.api.components.buttons.ButtonStyle
-import net.dv8tion.jda.api.components.selections.EntitySelectMenu
 import net.dv8tion.jda.api.interactions.InteractionHook
 
 object TicketModalHandler : ModalEvent {
@@ -107,10 +106,10 @@ object TicketModalHandler : ModalEvent {
             description = "Willkommen **${opener.nickname ?: opener.user.name}**!\n" +
 
                     "\nÜbersicht deiner **Meldung** gegen ein anderen Nutzer." +
-                    "\nSende weitere Nachweise oder Information direkt hier rein!\n" +
+                    "\nSende weitere Nachweise oder Information direkt hier rein!" +
                     "\n## User Report" +
                     "\n> ● **Nutzer** -> ${reported.asMention}" +
-                    "\n>  ‣ `${reported.user.name}` - `${reported.id}`" +
+                    "\n> <:blanc:1193179205589008455>‣ `${reported.user.name}` - `${reported.id}`" +
                     "\n> ● **Type** -> ${type}"
             footer("Ein Missbrauch des Ticketsystems führt zum Ausschluss!", "https://cdn.discordapp.com/avatars/1036252236151537664/6d4c02fa02a172898a4e84e846b1a635")
             color = 0xb800ff
