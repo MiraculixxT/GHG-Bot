@@ -14,7 +14,7 @@ object AlwaysOneFree : EventListener {
         val joined = it.channelJoined?.asVoiceChannel()
         val left = it.channelLeft?.asVoiceChannel()
 
-        println("$joined - $left")
+        //println("$joined - $left")
         joined?.checkJoined()
         left?.checkLeft()
     }

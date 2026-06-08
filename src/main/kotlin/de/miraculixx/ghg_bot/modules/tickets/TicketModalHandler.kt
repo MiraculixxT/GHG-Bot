@@ -5,6 +5,8 @@ import de.miraculixx.ghg_bot.utils.cache.ticketQuestionRole
 import de.miraculixx.ghg_bot.utils.cache.ticketReportRole
 import de.miraculixx.ghg_bot.utils.entities.ModalEvent
 import dev.minn.jda.ktx.generics.getChannel
+import dev.minn.jda.ktx.interactions.components.Container
+import dev.minn.jda.ktx.interactions.components.Thumbnail
 import dev.minn.jda.ktx.interactions.components.button
 import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.editMessage
@@ -80,7 +82,7 @@ object TicketModalHandler : ModalEvent {
             source.editMessage(content = "", embeds = listOf(Embed {
                 title = "Neues Ticket"
                 description = "Dein erstelltes Ticket findest du hier: ${thread.asMention}\n" +
-                        "Dort erhältst du Antworten oder kannst noch mehr schreiben"
+                        "Dort siehst du Antworten vom Team. Reports ohne Nachweise werden geschlossen!"
                 color = 0xb800ff
             })).queue()
         }
@@ -101,19 +103,26 @@ object TicketModalHandler : ModalEvent {
     }
 
     private fun ThreadChannel.setupReportTicket(opener: Member, reported: Member, message: String, type: String) {
-        send(embeds = listOf(Embed {
-            title = "\uD83D\uDD28  || **Nutzer Melden**"
-            description = "Willkommen **${opener.nickname ?: opener.user.name}**!\n" +
-
-                    "\nÜbersicht deiner **Meldung** gegen ein anderen Nutzer." +
-                    "\nSende weitere Nachweise oder Information direkt hier rein!" +
-                    "\n## User Report" +
-                    "\n> ● **Nutzer** -> ${reported.asMention}" +
-                    "\n> <:blanc:1193179205589008455>‣ `${reported.user.name}` - `${reported.id}`" +
-                    "\n> ● **Type** -> ${type}"
-            footer("Ein Missbrauch des Ticketsystems führt zum Ausschluss!", "https://cdn.discordapp.com/avatars/1036252236151537664/6d4c02fa02a172898a4e84e846b1a635")
-            color = 0xb800ff
-        }), components = listOf(ActionRow.of(buttonCloseReport))).queue()
+        sendMessageComponents(listOf(
+            Container {
+                text("## \uD83D\uDD28  || Nutzer Melden\nWillkommen **${opener.nickname ?: opener.user.name}**!\n" +
+                        "\nÜbersicht deiner **Meldung** gegen ein anderen Nutzer. Sende weitere Nachweise oder Information direkt hier rein!"
+                )
+                section {
+                    accessory = Thumbnail(opener.user.avatarUrl ?: "https://cdn.discordapp.com/avatars/1036252236151537664/6d4c02fa02a172898a4e84e846b1a635")
+                    text("## User Report" +
+                            "\n> ● **Nutzer** -> ${reported.asMention}" +
+                            "\n> <:blanc:1193179205589008455>‣ `${reported.user.name}` - `${reported.id}`" +
+                            "\n> ● **Type** -> **$type**"
+                    )
+                }
+            },
+            ActionRow.of(buttonCloseReport),
+            Container {
+                text(":warning: **Beachte, dass das Ticket, wenn du keinen Beweis anhängst, ohne jegliche Nachfrage geschlossen wird! Bei Problemen oder Ähnlichem stehen wir gerne zur Verfügung.**")
+                accentColorRaw = 0xE74C3C
+            }
+        )).useComponentsV2().queue()
         send(message).queue()
     }
 }
