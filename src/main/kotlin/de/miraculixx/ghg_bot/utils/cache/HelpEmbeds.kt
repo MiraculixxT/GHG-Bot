@@ -12,15 +12,15 @@ fun InlineEmbed.applyAutoFooter() {
 }
 
 val embedV4 = Embed {
-    description = "Das **ZickZack v4 Texturepack** ist aktuell noch nicht öffentlich!\n" +
+    description = "Das **ZickZack Texturepack** ist aktuell noch nicht öffentlich!\n" +
             "Wann oder ob es in der Zukunft veröffentlicht werden wird ist unklar, warte also einfach ab <:FeelsOkayMan:816743864379113472>"
     color = 0x9a00bc
     applyAutoFooter()
 }
 
 val embedAd = Embed {
-    description = "Jegliche Werbung oder Scam-Links, die du per DM ``(Direct Message)`` erhältst **nicht** an uns senden über Tickets oder in allgemeinen Chats. \n" +
-            "Reporte diese direkt an Discord, damit der Bot oder User als `spam` markiert wird und damit blockiert ist:"
+    description = "Jegliche Phishing oder Scam-Links (z.b. Steam Reports), die du per DM ``(Direct Message)`` erhältst direkt an Discord melden, öffne bitte kein Ticket dafür! \n" +
+            "Discord kann diese Accounts effizient Plattformweit sperren, besonders da jeden Tag hunderte neue davon erscheinen."
     image = "https://i.imgur.com/cKQyjjg.png"
     color = 0xcc0000
     applyAutoFooter()

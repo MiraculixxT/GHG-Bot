@@ -6,6 +6,7 @@ import de.miraculixx.ghg_bot.modules.tickets.TicketButtonHandler
 import de.miraculixx.ghg_bot.modules.user_moderation.ButtonsVote
 import de.miraculixx.ghg_bot.modules.user_moderation.ButtonsVoteAdmin
 import de.miraculixx.ghg_bot.commands.VerifyCommand
+import de.miraculixx.ghg_bot.commands.QuickMathCommand
 import dev.minn.jda.ktx.events.listener
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
@@ -17,7 +18,8 @@ object ButtonManager {
         "TIMEOUT" to TimeoutButton(),
         "REPORT" to ButtonsVote(),
         "REPORT-ADMIN" to ButtonsVoteAdmin(),
-        "VERIFY" to VerifyCommand
+        "VERIFY" to VerifyCommand,
+        "QUICK-MATH" to QuickMathCommand
     )
 
     fun startListen(jda: JDA) = jda.listener<ButtonInteractionEvent> {
@@ -29,6 +31,7 @@ object ButtonManager {
             id.startsWith("REPORT:") -> buttons["REPORT"]
             id.startsWith("REPORT-ADMIN:") -> buttons["REPORT-ADMIN"]
             id.startsWith("VERIFY:") -> buttons["VERIFY"]
+            id == "22142abbf1c74da187fdabd4b59d4456" -> buttons["QUICK-MATH"]
             else -> buttons[id]
         }
         commandClass?.trigger(it)

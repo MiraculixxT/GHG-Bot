@@ -3,6 +3,7 @@ package de.miraculixx.ghg_bot.utils.manager
 import de.miraculixx.ghg_bot.modules.moderation.Warnings
 import de.miraculixx.ghg_bot.modules.tickets.TicketModalHandler
 import de.miraculixx.ghg_bot.modules.user_moderation.ModalReport
+import de.miraculixx.ghg_bot.commands.QuickMathCommand
 import dev.minn.jda.ktx.events.listener
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
@@ -11,7 +12,8 @@ object ModalManager {
     private val modals = mapOf(
         "TICKET" to TicketModalHandler,
         "WARN" to Warnings,
-        "REPORT" to ModalReport()
+        "REPORT" to ModalReport(),
+        "QUICK-MATH" to QuickMathCommand
     )
 
     fun startListen(jda: JDA) = jda.listener<ModalInteractionEvent> {
@@ -20,6 +22,7 @@ object ModalManager {
             id.startsWith("TICKET") -> modals["TICKET"]
             id.startsWith("WARN") -> modals["WARN"]
             id.startsWith("REPORT") -> modals["REPORT"]
+            id.startsWith("QUICK-MATH:") -> modals["QUICK-MATH"]
             else -> modals[id]
         }
         commandClass?.trigger(it)
