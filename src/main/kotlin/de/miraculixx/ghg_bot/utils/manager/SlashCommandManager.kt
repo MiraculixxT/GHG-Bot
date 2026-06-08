@@ -34,6 +34,7 @@ object SlashCommandManager {
         "message" to MessageCommand(),
         "channel" to ChannelCommand(),
         "voice" to VoiceCommand,
+        "verify" to VerifyCommand,
     )
     private val streamCommands = setOf("tastatur", "maus", "socials", "merch", "monitor", "mauspad", "mc-settings", "pc-specs", "timolia")
 
@@ -187,6 +188,7 @@ object SlashCommandManager {
                     option<VoiceChannel>("channel", "Channel", true)
                 }
             },
+            Command("verify", "Verifiziere dich, um mehrere Links oder Anhänge senden zu können"),
             *streamCommands.map {
                 Command(it, "Informationen über Basti's $it")
             }.toTypedArray(),

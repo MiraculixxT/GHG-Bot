@@ -10,10 +10,12 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class SpamCheck : EventListener {
     private val imageSpam: MutableMap<String, Int> = mutableMapOf()
     private val sameMessageSpam: MutableMap<String, String> = mutableMapOf()
+    private val urlRegex = Regex("""(?i)(?:https?://[^\s<]+|www\.[^\s<]+|(?<![\w@])[\w-]+(?:\.[\w-]+)*\.[a-z]{2,}(?:[/?#][^\s<]*)?)""")
 
     override val listener: CoroutineEventListener = JDA.listener<MessageReceivedEvent> {
         val member = it.member ?: return@listener
@@ -21,6 +23,7 @@ class SpamCheck : EventListener {
         if (member.user.isBot) return@listener
         if (member.hasPermission(Permission.KICK_MEMBERS)) return@listener
 
+        if (it.checkLinkAttachmentVerification(member)) return@listener
         if (it.checkAttachmentSpam(id, member)) return@listener
         if (it.checkAds(member)) return@listener
         if (it.checkSimilarity(id, member)) return@listener
@@ -37,6 +40,25 @@ class SpamCheck : EventListener {
             modLog.send("```fix\nWerbung in spieler-suche Channel:\n$msg``` ${member.asMention} (${member.id})").queue()
             true
         } else false
+    }
+
+    private fun MessageReceivedEvent.checkLinkAttachmentVerification(member: Member): Boolean {
+        if (member.roles.any { it.idLong == VERIFIED_LINKS_ROLE }) return false
+
+        val linkCount = urlRegex.findAll(message.contentRaw).count()
+        val attachmentCount = message.attachments.size
+        if (linkCount + attachmentCount < 2) return false
+
+        message.reply("⚠\uFE0F Deine Nachricht wurde als potentieller Spam geflaggt! Bitte führe zuerst `/verify` aus.")
+            .queue(
+                { warning ->
+                    message.delete().queue()
+                    warning.delete().queueAfter(15, TimeUnit.SECONDS)
+                },
+                { message.delete().queue() }
+            )
+        modLog.send("```fix\n2+ Links/Anhänge ohne Verify-Rolle ($linkCount Links, $attachmentCount Anhänge).``` ${member.asMention} (${member.id})").queue()
+        return true
     }
 
     private fun MessageReceivedEvent.checkAttachmentSpam(id: String, member: Member): Boolean {
@@ -107,5 +129,9 @@ class SpamCheck : EventListener {
             if (i > 0) costs[s2.length] = lastValue
         }
         return costs[s2.length]
+    }
+
+    companion object {
+        const val VERIFIED_LINKS_ROLE = 1513489012994867210L
     }
 }
