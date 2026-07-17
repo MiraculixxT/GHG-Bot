@@ -117,7 +117,7 @@ object TicketModalHandler : ModalEvent {
                         "\nÜbersicht deiner **Meldung** gegen ein anderen Nutzer. Sende weitere Nachweise oder Information direkt hier rein!"
                 )
                 section {
-                    accessory = Thumbnail(opener.user.avatarUrl ?: "https://cdn.discordapp.com/avatars/1036252236151537664/6d4c02fa02a172898a4e84e846b1a635")
+                    accessory = Thumbnail(reported.user.avatarUrl ?: "https://cdn.discordapp.com/avatars/1036252236151537664/6d4c02fa02a172898a4e84e846b1a635")
                     text("## User Report" +
                             "\n> ● **Nutzer** -> ${reported.asMention}" +
                             "\n> <:blanc:1193179205589008455>‣ `${reported.user.name}` - `${reported.id}`" +
