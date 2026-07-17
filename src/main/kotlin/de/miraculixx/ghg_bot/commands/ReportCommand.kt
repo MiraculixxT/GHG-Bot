@@ -45,18 +45,7 @@ class ReportCommand : SlashCommandEvent {
 
     override suspend fun triggerUserApp(it: UserContextInteractionEvent) {
         val target = it.interaction.targetMember ?: return
-        it.replyModal("TICKET-REPORT", "Nutzer Melden") {
-            label("Nutzer Tag") {
-                child = TextInput("TAG", TextInputStyle.SHORT, value = target.user.asTag) {
-                    required = true
-                    requiredLength = 6..100
-                }
-            }
-            label("Nutzer ID") {
-                child = TextInput("ID", TextInputStyle.SHORT, value = target.id, requiredLength = 17..20) {
-                    required = true
-                }
-            }
+        it.replyModal("TICKET-REPORT-USER:${target.id}", "${target.user.name} melden") {
             label("Grund") {
                 child = TextInput("CONTENT", TextInputStyle.PARAGRAPH, placeholder = "Warum möchtest du den Nutzer melden?") {
                     required = true

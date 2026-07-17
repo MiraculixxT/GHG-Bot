@@ -37,8 +37,21 @@ object TicketModalHandler : ModalEvent {
         if (channel !is TextChannel) return
         println("Modal: ${it.modalId} by ${member.user.name} in channel ${channel.name}")
 
-        when (it.modalId) {
-            "TICKET-REPORT" -> {
+        when {
+            it.modalId.startsWith("TICKET-REPORT-USER:") -> {
+                val reportedID = it.modalId.substringAfterLast(':')
+                val reported = it.guild?.getMemberById(reportedID)
+                if (reported == null) {
+                    hook.editMessage(content = "```diff\n- Der Nutzer ist nicht mehr auf diesem Server und kann daher nicht gemeldet werden!```").queue()
+                    return
+                }
+
+                member.createTicket(TicketType.REPORT, hook) { thread ->
+                    thread.setupReportTicket(member, reported, message, "Direkte Nutzermeldung")
+                }
+            }
+
+            it.modalId == "TICKET-REPORT" -> {
                 val type = it.getValue("TYPE")?.asStringList?.firstOrNull() ?: "Nicht angegeben"
                 if (type == "SPAM") {
                     hook.editMessage(content = "## Vielen Dank für die Meldung\n" +
@@ -61,7 +74,7 @@ object TicketModalHandler : ModalEvent {
                 }
             }
 
-            "TICKET-OTHER" -> member.createTicket(TicketType.OTHER, hook) { thread ->
+            it.modalId == "TICKET-OTHER" -> member.createTicket(TicketType.OTHER, hook) { thread ->
                 thread.setupOtherTicket(member, message)
             }
 
