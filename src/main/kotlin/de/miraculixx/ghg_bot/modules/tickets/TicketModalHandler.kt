@@ -122,7 +122,7 @@ object TicketModalHandler : ModalEvent {
                 text(":warning: **Beachte, dass das Ticket, wenn du keinen Beweis anhängst, ohne jegliche Nachfrage geschlossen wird! Bei Problemen oder Ähnlichem stehen wir gerne zur Verfügung.**")
                 accentColorRaw = 0xE74C3C
             }
-        )).useComponentsV2().queue()
+        )).useComponentsV2().setAllowedMentions(listOf()).queue()
         send(message).queue()
     }
 }
