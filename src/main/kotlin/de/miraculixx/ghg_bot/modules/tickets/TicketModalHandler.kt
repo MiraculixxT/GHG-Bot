@@ -6,8 +6,13 @@ import de.miraculixx.ghg_bot.utils.cache.ticketReportRole
 import de.miraculixx.ghg_bot.utils.entities.ModalEvent
 import dev.minn.jda.ktx.generics.getChannel
 import dev.minn.jda.ktx.interactions.components.Container
+import dev.minn.jda.ktx.interactions.components.EntitySelectMenu
+import dev.minn.jda.ktx.interactions.components.Modal
+import dev.minn.jda.ktx.interactions.components.StringSelectMenu
+import dev.minn.jda.ktx.interactions.components.TextInput
 import dev.minn.jda.ktx.interactions.components.Thumbnail
 import dev.minn.jda.ktx.interactions.components.button
+import dev.minn.jda.ktx.interactions.components.option
 import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.editMessage
 import dev.minn.jda.ktx.messages.send
@@ -21,6 +26,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.components.actionrow.ActionRow
 import net.dv8tion.jda.api.components.buttons.ButtonStyle
+import net.dv8tion.jda.api.components.selections.EntitySelectMenu
+import net.dv8tion.jda.api.components.textinput.TextInputStyle
 import net.dv8tion.jda.api.interactions.InteractionHook
 
 object TicketModalHandler : ModalEvent {
@@ -37,21 +44,8 @@ object TicketModalHandler : ModalEvent {
         if (channel !is TextChannel) return
         println("Modal: ${it.modalId} by ${member.user.name} in channel ${channel.name}")
 
-        when {
-            it.modalId.startsWith("TICKET-REPORT-USER:") -> {
-                val reportedID = it.modalId.substringAfterLast(':')
-                val reported = it.guild?.getMemberById(reportedID)
-                if (reported == null) {
-                    hook.editMessage(content = "```diff\n- Der Nutzer ist nicht mehr auf diesem Server und kann daher nicht gemeldet werden!```").queue()
-                    return
-                }
-
-                member.createTicket(TicketType.REPORT, hook) { thread ->
-                    thread.setupReportTicket(member, reported, message, "Direkte Nutzermeldung")
-                }
-            }
-
-            it.modalId == "TICKET-REPORT" -> {
+        when (it.modalId) {
+            "TICKET-REPORT" -> {
                 val type = it.getValue("TYPE")?.asStringList?.firstOrNull() ?: "Nicht angegeben"
                 if (type == "SPAM") {
                     hook.editMessage(content = "## Vielen Dank für die Meldung\n" +
@@ -61,7 +55,8 @@ object TicketModalHandler : ModalEvent {
                 }
                 val reported = it.getValue("USER")?.asMentions?.members?.firstOrNull()
                 if (reported == null) {
-                    hook.editMessage(content = "```diff\n- Der Nutzer muss auf diesem Server sein, damit du ihn melden kannst!```").queue()
+                    hook.editMessage(content = "```diff\n- Der Nutzer muss auf diesem Server sein, damit du ihn melden kannst!\n" +
+                            "Möglicherweise haben wir ihn bereits gebannt oder er ist von selbst gegangen.```").queue()
                     return
                 }
                 val evidence = it.getValue("EVIDENCE")?.asStringList?.firstOrNull() == "YES"
@@ -74,7 +69,7 @@ object TicketModalHandler : ModalEvent {
                 }
             }
 
-            it.modalId == "TICKET-OTHER" -> member.createTicket(TicketType.OTHER, hook) { thread ->
+            "TICKET-OTHER" -> member.createTicket(TicketType.OTHER, hook) { thread ->
                 thread.setupOtherTicket(member, message)
             }
 
@@ -138,4 +133,36 @@ object TicketModalHandler : ModalEvent {
         )).useComponentsV2().queue()
         send(message).queue()
     }
+
+    //
+    // Shared states
+    //
+    fun getUserReportModal(target: Long?) = Modal("TICKET-REPORT", "Nutzer melden") {
+            label("Der Nutzer") {
+                child = EntitySelectMenu("USER", listOf(EntitySelectMenu.SelectTarget.USER)) {
+                    target?.let { setDefaultValues(EntitySelectMenu.DefaultValue.user(it)) }
+                }
+            }
+
+            label("Grund & Nachweis") {
+                description = "Erkläre so gut wie möglich, wie der Nutzer die Regeln bricht! (Datei Nachweise ins Ticket hochladen)"
+                child = TextInput("CONTENT", TextInputStyle.PARAGRAPH, placeholder = "Der Nutzer macht...", requiredLength = 50..2000)
+            }
+
+            label("Regelbruch Art") {
+                child = StringSelectMenu("TYPE") {
+                    option("Scam / Steam Report / Phishing", "SPAM", emoji = Emoji.fromFormatted("\uD83C\uDF10"))
+                    option("Voice Channel", "VOICE", emoji = Emoji.fromFormatted("\uD83C\uDF99\uFE0F"))
+                    option("Server Chat", "CHAT", emoji = Emoji.fromFormatted("\uD83D\uDCDD"))
+                    option("Sonstiges", "OTHER", "Reports in dieser Kategorie können länger dauern")
+                }
+            }
+
+            label("Nachweis Vorhanden?") {
+                child = StringSelectMenu("EVIDENCE") {
+                    option("Ich hab einen Link beigelegt oder lade es gleich ins Ticket!", "YES", "Voice Channel: Video - Text/User: Screenshots", emoji = Emoji.fromFormatted("✅"))
+                    option("Nein, habe nichts", "NO", "Leider können wir ohne Nachweise nicht viel machen. Andere Nutzer als Zeugen zählen nicht", emoji = Emoji.fromFormatted("❌"))
+                }
+            }
+        }
 }
