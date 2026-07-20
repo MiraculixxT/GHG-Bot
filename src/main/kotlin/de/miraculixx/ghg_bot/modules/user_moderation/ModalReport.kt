@@ -14,7 +14,7 @@ class ModalReport: ModalEvent {
         val report = UserModerationManager.cases[reportID] ?: return
         report.reason = reason
 
-        it.reply_("## Danke für deine Meldung!\nDu kannst den Status deiner aktuellen Meldung in <#1193169356239163432> (<#1193168949735596093>) nachschauen.", ephemeral = true).queue()
+        it.reply_("## Danke für deine Meldung!\nUnser Team wird sich die Meldung angucken und möglichst bald bearbeiten.", ephemeral = true).queue()
         report.send()
     }
 }
