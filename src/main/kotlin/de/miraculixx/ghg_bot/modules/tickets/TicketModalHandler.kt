@@ -107,7 +107,7 @@ object TicketModalHandler : ModalEvent {
             footer("Ein Missbrauch des Ticketsystems führt zum Ausschluss!", "https://cdn.discordapp.com/avatars/1036252236151537664/6d4c02fa02a172898a4e84e846b1a635")
             color = 0xb800ff
         }), components = listOf(ActionRow.of(buttonCloseOther))).queue()
-        send(message).queue()
+        send(message).setAllowedMentions(listOf()).queue()
     }
 
     private fun ThreadChannel.setupReportTicket(opener: Member, reported: Member, message: String, type: String) {
@@ -131,7 +131,7 @@ object TicketModalHandler : ModalEvent {
                 accentColorRaw = 0xE74C3C
             }
         )).useComponentsV2().setAllowedMentions(listOf()).queue()
-        send(message).queue()
+        send(message).setAllowedMentions(listOf()).queue()
     }
 
     //
