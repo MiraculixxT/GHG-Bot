@@ -1,7 +1,6 @@
 package de.miraculixx.ghg_bot.modules.user_moderation
 
 import club.minnced.discord.webhook.send.WebhookMessageBuilder
-import de.miraculixx.ghg_bot.utils.cache.teamRole
 import de.miraculixx.ghg_bot.utils.extensions.mentionlessContent
 import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.interactions.components.danger
@@ -32,7 +31,6 @@ data class MessageReport(
         finalMessage = message.mentionlessContent()
 
         reportCaseMessage = UserModerationManager.reportChannel.send(
-            teamRole.asMention,
             embeds = listOf(buildEmbed()),
             components = listOf(
                 ActionRow.of(
