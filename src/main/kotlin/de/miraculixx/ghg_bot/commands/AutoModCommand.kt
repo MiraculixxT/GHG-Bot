@@ -25,7 +25,7 @@ class AutoModCommand : SlashCommandEvent {
             "list" -> it.replyEmbeds(Embed {
                 title = "Aktuelle Filter für $filter"
                 description = buildString {
-                    ConfigManager.regex[filterEnum]?.forEach { s ->
+                    ConfigManager.autoSupport[filterEnum]?.forEach { s ->
                         LOGGER.debug("Support filter '$filter' entry: $s")
                         append("- $s\n")
                     }
@@ -34,7 +34,7 @@ class AutoModCommand : SlashCommandEvent {
 
             "add" -> {
                 filterEnum ?: return
-                ConfigManager.regex.getOrPut(filterEnum) {
+                ConfigManager.autoSupport.getOrPut(filterEnum) {
                     mutableListOf()
                 }.add(value ?: return)
                 ConfigManager.updateRegex()
@@ -42,7 +42,7 @@ class AutoModCommand : SlashCommandEvent {
             }
 
             "remove" -> {
-                ConfigManager.regex[filterEnum]?.remove(value ?: return)
+                ConfigManager.autoSupport[filterEnum]?.remove(value ?: return)
                 ConfigManager.updateRegex()
                 it.reply_("Erfolgreich $value von $filter entfernt!", ephemeral = true).queue()
             }
