@@ -33,6 +33,7 @@ import net.dv8tion.jda.api.interactions.InteractionHook
 
 object TicketModalHandler : ModalEvent {
     private val buttonCloseReport = button("TICKET-CLOSE-REPORT", "Schließen", Emoji.fromFormatted("\uD83D\uDD12"), style = ButtonStyle.DANGER)
+    private val buttonCloseReportNoProof = button("TICKET-CLOSE-REPORTPROOF", "Kein Nachweis", Emoji.fromFormatted("\uD83D\uDD12"), style = ButtonStyle.SECONDARY)
     private val buttonCloseOther = button("TICKET-CLOSE", "Schließen", Emoji.fromFormatted("\uD83D\uDD12"), style = ButtonStyle.DANGER)
     private val reportChannel = JDA.getChannel<TextChannel>(859833491251789844)!!
 
@@ -127,7 +128,7 @@ object TicketModalHandler : ModalEvent {
                     )
                 }
             },
-            ActionRow.of(buttonCloseReport),
+            ActionRow.of(buttonCloseReport, buttonCloseReportNoProof),
             Container {
                 text(":warning: **Beachte, dass das Ticket, wenn du keinen Beweis anhängst, ohne jegliche Nachfrage geschlossen wird! Bei Problemen oder Ähnlichem stehen wir gerne zur Verfügung.**")
                 accentColorRaw = 0xE74C3C

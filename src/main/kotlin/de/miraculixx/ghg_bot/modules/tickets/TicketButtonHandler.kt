@@ -1,11 +1,11 @@
 package de.miraculixx.ghg_bot.modules.tickets
 
-import de.miraculixx.ghg_bot.utils.cache.*
+import de.miraculixx.ghg_bot.utils.cache.guildGHG
+import de.miraculixx.ghg_bot.utils.cache.ticketArchive
+import de.miraculixx.ghg_bot.utils.cache.ticketQuestionRole
+import de.miraculixx.ghg_bot.utils.cache.ticketReportRole
 import de.miraculixx.ghg_bot.utils.entities.ButtonEvent
-import dev.minn.jda.ktx.interactions.components.TextInput
-import dev.minn.jda.ktx.interactions.components.replyModal
 import dev.minn.jda.ktx.messages.Embed
-import net.dv8tion.jda.api.components.textinput.TextInputStyle
 import dev.minn.jda.ktx.messages.editMessage
 import dev.minn.jda.ktx.messages.send
 import kotlinx.coroutines.CoroutineScope
@@ -34,6 +34,12 @@ class TicketButtonHandler : ButtonEvent {
                 it.message.editMessageComponents().queue()
                 it.deferReply().queue()
                 closeTicket(getChannel(it) ?: return, it.hook, member, "Vielen Dank für deinen Report!\nWir haben dementsprechend gehandelt.")
+            }
+
+            "TICKET-CLOSE-REPORTPROOF" -> {
+                it.message.editMessageComponents().queue()
+                it.deferReply().queue()
+                closeTicket(getChannel(it) ?: return, it.hook, member, "Kein gültiger Nachweis. Wir können nur Reports mit bewertbaren Nachweisen bearbeiten!")
             }
         }
     }
