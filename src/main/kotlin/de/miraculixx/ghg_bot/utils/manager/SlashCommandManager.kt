@@ -3,10 +3,9 @@ package de.miraculixx.ghg_bot.utils.manager
 import de.miraculixx.ghg_bot.JDA
 import de.miraculixx.ghg_bot.commands.*
 import de.miraculixx.ghg_bot.modules.auto_support.SupportFilter
-import de.miraculixx.ghg_bot.utils.log.log
+import de.miraculixx.ghg_bot.utils.log.LOGGER
 import dev.minn.jda.ktx.events.listener
 import dev.minn.jda.ktx.interactions.commands.Command
-import dev.minn.jda.ktx.interactions.commands.choice
 import dev.minn.jda.ktx.interactions.commands.option
 import dev.minn.jda.ktx.interactions.commands.subcommand
 import net.dv8tion.jda.api.JDA
@@ -42,7 +41,7 @@ object SlashCommandManager {
     fun startListen(jda: JDA) = jda.listener<SlashCommandInteractionEvent> {
         val commandClass = commands[it.name] ?: (if (streamCommands.contains(it.name)) commands["stream-commands"] else null) ?: return@listener
         val options = buildString { it.options.forEach { option -> append(option.asString + " ") } }
-        ">> ${it.user.asTag} -> /${it.name}${it.subcommandName ?: ""} $options".log()
+        LOGGER.info(">> ${it.user.asTag} -> /${it.name}${it.subcommandName ?: ""} $options")
         commandClass.trigger(it)
     }
 
@@ -71,7 +70,7 @@ object SlashCommandManager {
             it.leave().queue()
         }
 
-        "Guilds - ${JDA.guilds.size}".log()
+        LOGGER.info("Guilds - ${JDA.guilds.size}")
         JDA.updateCommands().addCommands(
             Command("auto-support", "Setup the regex for auto support messages") {
                 defaultPermissions = DefaultMemberPermissions.DISABLED

@@ -15,9 +15,7 @@ import de.miraculixx.ghg_bot.modules.other.StickyMessage
 import de.miraculixx.ghg_bot.modules.tickets.TicketMessages
 import de.miraculixx.ghg_bot.modules.user_moderation.UserModerationManager
 import de.miraculixx.ghg_bot.modules.voice.AlwaysOneFree
-import de.miraculixx.ghg_bot.utils.log.Color
-import de.miraculixx.ghg_bot.utils.log.consoleChannel
-import de.miraculixx.ghg_bot.utils.log.log
+import de.miraculixx.ghg_bot.utils.log.LOGGER
 import de.miraculixx.ghg_bot.utils.manager.ButtonManager
 import de.miraculixx.ghg_bot.utils.manager.DropDownManager
 import de.miraculixx.ghg_bot.utils.manager.ModalManager
@@ -109,7 +107,6 @@ class Main {
             setMemberCachePolicy(MemberCachePolicy.ALL)
         }
         JDA.awaitReady()
-        consoleChannel = JDA.getTextChannelById(1036256164284997773)!!
 
         SlashCommandManager.startListen(JDA)
         ButtonManager.startListen(JDA)
@@ -129,7 +126,7 @@ class Main {
         StickyMessage
         FanartHighlighting
 
-        "GHG Bot is now online!".log(Color.GREEN)
+        LOGGER.info("GHG Bot is now online!")
 
         command()
     }

@@ -3,7 +3,7 @@
 package de.miraculixx.ghg_bot.config
 
 import de.miraculixx.ghg_bot.utils.extensions.enumOf
-import de.miraculixx.ghg_bot.utils.log.log
+import de.miraculixx.ghg_bot.utils.log.LOGGER
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.InputStream
@@ -25,10 +25,10 @@ class Config(stream: InputStream?, private val name: String) {
         return try {
             configMap[name] as List<String>
         } catch (e: ClassCastException) {
-            "ERROR > Value $name in Config ${this.name} cannot be casted to List<String>".log()
+            LOGGER.error("Value $name in Config ${this.name} cannot be casted to List<String>")
             emptyList()
         } catch (e: NullPointerException) {
-            "ERROR > Value $name in Config ${this.name} is empty".log()
+            LOGGER.error("Value $name in Config ${this.name} is empty")
             emptyList()
         }
     }
@@ -43,10 +43,10 @@ class Config(stream: InputStream?, private val name: String) {
             }
             map
         } catch (e: ClassCastException) {
-            "ERROR > Value $name in Config ${this.name} cannot be casted to List<Map<String, T>>".log()
+            LOGGER.error("Value $name in Config ${this.name} cannot be casted to List<Map<String, T>>")
             linkedMapOf()
         } catch (e: NullPointerException) {
-            "ERROR > Value $name in Config ${this.name} is empty".log()
+            LOGGER.error("Value $name in Config ${this.name} is empty")
             linkedMapOf()
         }
     }
@@ -69,7 +69,7 @@ class Config(stream: InputStream?, private val name: String) {
 
 
     private fun loadConfig(file: File, input: InputStream) {
-        ">> Create new Config File - $name".log()
+        LOGGER.info(">> Create new Config File - $name")
         if (!file.exists()) {
             file.createNewFile()
             file.writeBytes(input.readAllBytes())
@@ -77,7 +77,7 @@ class Config(stream: InputStream?, private val name: String) {
     }
 
     init {
-        ">> Load Config - $name".log()
+        LOGGER.info(">> Load Config - $name")
         val file = Path("config/$name.yml").toFile()
         configMap = if (stream != null) {
             if (!file.exists()) loadConfig(file, stream)
@@ -86,12 +86,12 @@ class Config(stream: InputStream?, private val name: String) {
                 yaml.load<Map<String, Any>>(file.inputStream()).toMutableMap()
             } catch (e: Exception) {
                 e.printStackTrace()
-                "ERROR - Failed to load Configuration File. ^^ Reason above ^^".log()
-                "ERROR - Config Path -> ${file.path}".log()
+                LOGGER.error("Failed to load Configuration File. ^^ Reason above ^^")
+                LOGGER.error("Config Path -> ${file.path}")
                 mutableMapOf()
             }
         } else {
-            "ERROR - Configuration file is null".log()
+            LOGGER.error("Configuration file is null")
             mutableMapOf()
         }
     }
