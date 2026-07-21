@@ -13,7 +13,7 @@ object VerifyCommand : SlashCommandEvent, ButtonEvent {
     override suspend fun trigger(it: SlashCommandInteractionEvent) {
         val member = it.member ?: return
         if (member.roles.any { role -> role.idLong == SpamCheck.VERIFIED_LINKS_ROLE }) {
-            it.reply("Du bist bereits verifiziert. Du willst trotzdem bisschen Quick-Math machen? Dann ab in <#1036242559959302164> und `/quick-math`!").setEphemeral(true).queue()
+            it.reply("Du bist bereits verifiziert. Du willst trotzdem bisschen Quick-Math machen? Dann ab in <#1513947364983967906> und nutze `/quick-math play`!").setEphemeral(true).queue()
             return
         }
 
