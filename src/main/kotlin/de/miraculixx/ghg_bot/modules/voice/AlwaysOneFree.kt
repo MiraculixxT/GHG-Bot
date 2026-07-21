@@ -1,6 +1,7 @@
 package de.miraculixx.ghg_bot.modules.voice
 
 import de.miraculixx.ghg_bot.JDA
+import de.miraculixx.ghg_bot.config.ConfigManager
 import de.miraculixx.ghg_bot.utils.entities.EventListener
 import dev.minn.jda.ktx.events.CoroutineEventListener
 import dev.minn.jda.ktx.events.listener
@@ -8,7 +9,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent
 
 object AlwaysOneFree : EventListener {
-    private val category = JDA.getCategoryById(486142012194684928)!!
+    private val category = JDA.getCategoryById(ConfigManager.specialChannels.voiceCategory)!!
 
     override val listener: CoroutineEventListener = JDA.listener<GuildVoiceUpdateEvent> {
         val joined = it.channelJoined?.asVoiceChannel()

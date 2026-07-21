@@ -1,6 +1,7 @@
 package de.miraculixx.ghg_bot.modules.other
 
 import de.miraculixx.ghg_bot.JDA
+import de.miraculixx.ghg_bot.config.ConfigManager
 import de.miraculixx.ghg_bot.utils.cache.guildGHG
 import de.miraculixx.ghg_bot.utils.entities.EventListener
 import de.miraculixx.ghg_bot.utils.log.LOGGER
@@ -23,15 +24,15 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent
 import net.dv8tion.jda.internal.entities.ForumTagImpl
 
 object FanartHighlighting: EventListener {
-    private val fanartChannel = 1048240752095936542
-    private val highlightTag = ForumTagImpl(1048241864244990013)
-    private val fanartTag = ForumTagImpl(1048241662280876133)
-    private var roleID = 1451241076697469080
+    private val highlightTag = ForumTagImpl(ConfigManager.specialChannels.fanart.highlightTag)
+    private val fanartTag = ForumTagImpl(ConfigManager.specialChannels.fanart.fanartTag)
+    private var roleID = ConfigManager.specialChannels.fanart.awardRole
+    private var channelID = ConfigManager.specialChannels.fanart.channel
 
     override val listener: CoroutineEventListener = JDA.listener<MessageReactionAddEvent> {
         CoroutineScope(Dispatchers.Default).launch {
             val thread = it.channel as? ThreadChannel ?: return@launch
-            if (thread.parentChannel.idLong != fanartChannel) return@launch
+            if (thread.parentChannel.idLong != channelID) return@launch
 
             // Check if original message
             val startMessage = thread.retrieveStartMessage().await()

@@ -1,6 +1,7 @@
 package de.miraculixx.ghg_bot.modules.tickets
 
 import de.miraculixx.ghg_bot.JDA
+import de.miraculixx.ghg_bot.utils.cache.ticketChannelID
 import de.miraculixx.ghg_bot.utils.cache.ticketQuestionRole
 import de.miraculixx.ghg_bot.utils.cache.ticketReportRole
 import de.miraculixx.ghg_bot.utils.entities.ModalEvent
@@ -35,7 +36,7 @@ object TicketModalHandler : ModalEvent {
     private val buttonCloseReport = button("TICKET-CLOSE-REPORT", "Schließen", Emoji.fromFormatted("\uD83D\uDD12"), style = ButtonStyle.DANGER)
     private val buttonCloseReportNoProof = button("TICKET-CLOSE-REPORTPROOF", "Kein Nachweis", Emoji.fromFormatted("\uD83D\uDD12"), style = ButtonStyle.SECONDARY)
     private val buttonCloseOther = button("TICKET-CLOSE", "Schließen", Emoji.fromFormatted("\uD83D\uDD12"), style = ButtonStyle.DANGER)
-    private val reportChannel = JDA.getChannel<TextChannel>(859833491251789844)!!
+    private val reportChannel = JDA.getChannel<TextChannel>(ticketChannelID)!!
 
     override suspend fun trigger(it: ModalInteractionEvent) {
         val member = it.member ?: return

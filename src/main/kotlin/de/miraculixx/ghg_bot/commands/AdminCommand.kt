@@ -2,6 +2,7 @@ package de.miraculixx.ghg_bot.commands
 
 import de.miraculixx.ghg_bot.JDA
 import de.miraculixx.ghg_bot.Main
+import de.miraculixx.ghg_bot.config.ConfigManager
 import de.miraculixx.ghg_bot.utils.cache.guildGHG
 import de.miraculixx.ghg_bot.utils.entities.SlashCommandEvent
 import de.miraculixx.ghg_bot.utils.extensions.json
@@ -204,15 +205,16 @@ class AdminCommand : SlashCommandEvent {
     }
 
     private fun getNotifyPanel(): Pair<MessageEmbed, Button> {
+        val notiIDs = ConfigManager.specialChannels.notifications
         return Embed {
             title = "\uD83D\uDD14 ||  **Twitch & YouTube Pings**"
             description = "<:blanc:1059482494644269056> \n" +
                     "Hier kannst du Ping **Benachrichtigungen** für neue Twitch **Streams** oder YouTube **Videos** aktivieren oder deaktivieren. " +
                     "Klicke dafür auf den :bell: Knopf unter dieser Nachricht!\n" +
                     "\n" +
-                    "> <@&604279182872018974> -> YouTube **Hauptkanal** Videos\n" +
-                    "> <@&604279184038297620> -> YouTube **Zweitkanal** Videos\n" +
-                    "> <@&604277191823589396> -> Twitch **Streams**"
+                    "> <@&${notiIDs.ytMainRole}> -> YouTube **Hauptkanal** Videos\n" +
+                    "> <@&${notiIDs.ytSecondRole}> -> YouTube **Zweitkanal** Videos\n" +
+                    "> <@&${notiIDs.twitchRole}> -> Twitch **Streams**"
             color = 0xb800ff
         } to button("NOTIFY", "Einstellungen ändern", Emoji.fromFormatted("\uD83D\uDD14"), style = ButtonStyle.PRIMARY)
     }

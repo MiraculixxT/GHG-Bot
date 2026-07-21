@@ -2,6 +2,7 @@ package de.miraculixx.ghg_bot.modules.user_moderation
 
 import club.minnced.discord.webhook.WebhookClientBuilder
 import de.miraculixx.ghg_bot.JDA
+import de.miraculixx.ghg_bot.config.ConfigManager
 import dev.minn.jda.ktx.generics.getChannel
 import kotlinx.serialization.json.Json
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
@@ -9,7 +10,7 @@ import java.io.File
 import java.util.*
 
 object UserModerationManager {
-    val reportChannel = JDA.getChannel<MessageChannel>(1193169356239163432)!!
+    val reportChannel = JDA.getChannel<MessageChannel>(ConfigManager.specialChannels.reportChannel)!!
     private val credentialsFile = File("config/webhooks.json")
 
     val cases = mutableMapOf<UUID, MessageReport>()

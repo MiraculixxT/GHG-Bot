@@ -1,7 +1,7 @@
 package de.miraculixx.ghg_bot.modules.auto_support
 
 import de.miraculixx.ghg_bot.JDA
-import de.miraculixx.ghg_bot.utils.cache.supportRegex
+import de.miraculixx.ghg_bot.modules.auto_support.SupportData.supportRegex
 import de.miraculixx.ghg_bot.utils.entities.EventListener
 import dev.minn.jda.ktx.events.CoroutineEventListener
 import dev.minn.jda.ktx.events.listener
@@ -18,7 +18,7 @@ class AutoSupportMessages: EventListener {
                 when (filter) {
                     SupportFilter.SPAM -> {
                         // Only fire if a picture is sent with
-                        if (message.attachments.size > 0) message.replyEmbeds(filter.embed).queue()
+                        if (message.attachments.isNotEmpty()) message.replyEmbeds(filter.embed).queue()
                     }
 
                     else -> message.replyEmbeds(filter.embed).queue()

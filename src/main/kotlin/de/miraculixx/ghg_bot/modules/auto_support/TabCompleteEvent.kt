@@ -16,7 +16,7 @@ class TabCompleteEvent: EventListener {
             "auto-support" -> {
                 if (it.focusedOption.name != "key") return@listener
                 val filter = it.getOption("filter")?.asString ?: return@listener
-                val regexList = ConfigManager.autoSupport[enumOf(filter)] ?: return@listener
+                val regexList = ConfigManager.autoSupport.regexMap[enumOf(filter)] ?: return@listener
                 it.replyChoiceStrings(regexList).queue()
             }
 

@@ -1,6 +1,7 @@
 package de.miraculixx.ghg_bot.commands
 
 import de.miraculixx.ghg_bot.config.ConfigManager
+import de.miraculixx.ghg_bot.modules.auto_support.SupportData
 import de.miraculixx.ghg_bot.modules.auto_support.SupportFilter
 import de.miraculixx.ghg_bot.utils.entities.SlashCommandEvent
 import de.miraculixx.ghg_bot.utils.extensions.enumOf
@@ -25,7 +26,7 @@ class AutoModCommand : SlashCommandEvent {
             "list" -> it.replyEmbeds(Embed {
                 title = "Aktuelle Filter für $filter"
                 description = buildString {
-                    ConfigManager.autoSupport[filterEnum]?.forEach { s ->
+                    ConfigManager.autoSupport.regexMap[filterEnum]?.forEach { s ->
                         LOGGER.debug("Support filter '$filter' entry: $s")
                         append("- $s\n")
                     }
@@ -34,16 +35,16 @@ class AutoModCommand : SlashCommandEvent {
 
             "add" -> {
                 filterEnum ?: return
-                ConfigManager.autoSupport.getOrPut(filterEnum) {
+                ConfigManager.autoSupport.regexMap.getOrPut(filterEnum) {
                     mutableListOf()
                 }.add(value ?: return)
-                ConfigManager.updateRegex()
+                SupportData.buildRegex()
                 it.reply_("Erfolgreich $value zu $filter hinzugefügt!", ephemeral = true).queue()
             }
 
             "remove" -> {
-                ConfigManager.autoSupport[filterEnum]?.remove(value ?: return)
-                ConfigManager.updateRegex()
+                ConfigManager.autoSupport.regexMap[filterEnum]?.remove(value ?: return)
+                SupportData.buildRegex()
                 it.reply_("Erfolgreich $value von $filter entfernt!", ephemeral = true).queue()
             }
 

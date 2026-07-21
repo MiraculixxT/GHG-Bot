@@ -1,5 +1,6 @@
 package de.miraculixx.ghg_bot.modules.notifications
 
+import de.miraculixx.ghg_bot.config.ConfigManager
 import de.miraculixx.ghg_bot.utils.cache.guildGHG
 import de.miraculixx.ghg_bot.utils.entities.ButtonEvent
 import dev.minn.jda.ktx.interactions.components.button
@@ -14,9 +15,9 @@ import net.dv8tion.jda.api.components.buttons.Button
 import net.dv8tion.jda.api.components.buttons.ButtonStyle
 
 class NotifyButtons : ButtonEvent {
-    private val ytMainRole = guildGHG.getRoleById(604279182872018974)
-    private val ytSecondRole = guildGHG.getRoleById(604279184038297620)
-    private val twitchRole = guildGHG.getRoleById(604277191823589396)
+    private val ytMainRole = guildGHG.getRoleById(ConfigManager.specialChannels.notifications.ytMainRole)
+    private val ytSecondRole = guildGHG.getRoleById(ConfigManager.specialChannels.notifications.ytSecondRole)
+    private val twitchRole = guildGHG.getRoleById(ConfigManager.specialChannels.notifications.twitchRole)
     private val bellActive = Emoji.fromFormatted("\uD83D\uDD14")
     private val bellDisabled = Emoji.fromFormatted("\uD83D\uDD15")
     private val notifyEmbed = Embed {

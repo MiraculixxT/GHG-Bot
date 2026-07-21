@@ -2,6 +2,7 @@ package de.miraculixx.ghg_bot.utils.manager
 
 import de.miraculixx.ghg_bot.JDA
 import de.miraculixx.ghg_bot.commands.*
+import de.miraculixx.ghg_bot.config.ConfigManager
 import de.miraculixx.ghg_bot.modules.auto_support.SupportFilter
 import de.miraculixx.ghg_bot.utils.log.LOGGER
 import dev.minn.jda.ktx.events.listener
@@ -25,20 +26,16 @@ object SlashCommandManager {
         "auto-support" to AutoModCommand(),
         "support" to HelpCommand,
         "admin" to AdminCommand(),
-        "just-google" to LetMeGoogleCommand(),
         "warnings" to WarnCommand(),
-        "stream-commands" to StreamCommands(),
         "report" to ReportCommand(),
         "message" to MessageCommand(),
-        "channel" to ChannelCommand(),
         "voice" to VoiceCommand,
         "verify" to VerifyCommand,
         "quick-math" to QuickMathCommand,
     )
-    private val streamCommands = setOf("tastatur", "maus", "socials", "merch", "monitor", "mauspad", "mc-settings", "pc-specs", "timolia")
 
     fun startListen(jda: JDA) = jda.listener<SlashCommandInteractionEvent> {
-        val commandClass = commands[it.name] ?: (if (streamCommands.contains(it.name)) commands["stream-commands"] else null) ?: return@listener
+        val commandClass = commands[it.name] ?: return@listener
         val options = buildString { it.options.forEach { option -> append(option.asString + " ") } }
         LOGGER.info("Command executed: ${it.user.asTag} -> /${it.name}${it.subcommandName ?: ""} $options")
         commandClass.trigger(it)
@@ -64,7 +61,7 @@ object SlashCommandManager {
         //Implement all Commands into Discord
 
         JDA.guilds.forEach {
-            if (it.idLong == 484676017513037844 || it.idLong == 989881712492298250) return@forEach
+            if (ConfigManager.specialChannels.whitelistedGuilds.contains(it.idLong)) return@forEach
             LOGGER.warn("Leaving unauthorized guild ${it.idLong} - ${it.name} (owner ${it.retrieveOwner().complete().idLong})")
             it.leave().queue()
         }
@@ -151,18 +148,6 @@ object SlashCommandManager {
                 subcommand("say", "Send a simple message") {
                     option<String>("message", "What should be sent?", true)
                 }
-                subcommand("say-json", "Send a complex message from https://discohook.org") {
-                    option<String>("json", "The JSON context", true)
-                    addOption(OptionType.ATTACHMENT, "upload", "The file to upload", false)
-                }
-            },
-            Command("channel", "Toggle a channel type") {
-                defaultPermissions = DefaultMemberPermissions.DISABLED
-                subcommand("command-only", "Toggle command only for current channel")
-                subcommand("media-only", "Toggle command only for current channel")
-                subcommand("sticky-message", "Setup a sticky message for this channel") {
-                    option<String>("message", "Enter . to remove any message", true)
-                }
             },
             Command("voice", "...") {
                 defaultPermissions = DefaultMemberPermissions.DISABLED
@@ -171,10 +156,6 @@ object SlashCommandManager {
                 }
             },
             Command("verify", "Verifiziere dich, um mehrere Links oder Anhänge senden zu können"),
-            Command("quick-math", "Starte ein öffentliches Quick-Math Rätsel"),
-            *streamCommands.map {
-                Command(it, "Informationen über Basti's $it")
-            }.toTypedArray(),
             Commands.user("Melde Nutzer").setContexts(InteractionContextType.GUILD),
             Commands.message("Melde Nachricht").setContexts(InteractionContextType.GUILD),
             Commands.user("warnings").setContexts(InteractionContextType.GUILD).setDefaultPermissions(DefaultMemberPermissions.DISABLED),

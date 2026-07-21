@@ -4,14 +4,12 @@ import de.miraculixx.ghg_bot.commands.HelpCommand
 import de.miraculixx.ghg_bot.config.ConfigManager
 import de.miraculixx.ghg_bot.modules.auto_support.AutoSupportMessages
 import de.miraculixx.ghg_bot.modules.auto_support.AutoSupportReactions
+import de.miraculixx.ghg_bot.modules.auto_support.SupportData
 import de.miraculixx.ghg_bot.modules.auto_support.TabCompleteEvent
 import de.miraculixx.ghg_bot.modules.moderation.SpamCheck
 import de.miraculixx.ghg_bot.modules.moderation.Warnings
-import de.miraculixx.ghg_bot.modules.other.CommandOnlyChannel
 import de.miraculixx.ghg_bot.modules.other.FanartHighlighting
-import de.miraculixx.ghg_bot.modules.other.MediaOnlyChannel
 import de.miraculixx.ghg_bot.modules.other.ThreadChannel
-import de.miraculixx.ghg_bot.modules.other.StickyMessage
 import de.miraculixx.ghg_bot.modules.tickets.TicketMessages
 import de.miraculixx.ghg_bot.modules.voice.AlwaysOneFree
 import de.miraculixx.ghg_bot.utils.log.LOGGER
@@ -54,9 +52,6 @@ class Main {
                         ConfigManager.save()
                         Warnings.save()
 
-                        CommandOnlyChannel.save()
-                        MediaOnlyChannel.save()
-                        StickyMessage.save()
                         HelpCommand.save()
 
                         JDA.shardManager?.setStatus(OnlineStatus.OFFLINE)
@@ -67,17 +62,13 @@ class Main {
                         ConfigManager.save()
                         Warnings.save()
 
-                        CommandOnlyChannel.save()
-                        MediaOnlyChannel.save()
-                        StickyMessage.save()
-
                         HelpCommand.save()
 
                         println("Configs saved!")
                     }
 
                     "load" -> {
-                        ConfigManager.updateRegex()
+                        SupportData.buildRegex()
                         println("Configs updated!")
                     }
 
@@ -97,7 +88,7 @@ class Main {
                 )
             )
             enableCache(CacheFlag.VOICE_STATE)
-            setActivity(Activity.watching("nach Fragen \uD83D\uDC40"))
+            setActivity(Activity.watching("sucht nach \uD83C\uDF70"))
             setStatus(OnlineStatus.IDLE)
             intents += listOf(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_VOICE_STATES)
             intents -= listOf(GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_MESSAGE_TYPING)
@@ -113,14 +104,12 @@ class Main {
         Warnings
         ThreadChannel
         AlwaysOneFree
-        CommandOnlyChannel
 
         AutoSupportMessages()
         AutoSupportReactions()
         TicketMessages()
         SpamCheck()
 
-        StickyMessage
         FanartHighlighting
 
         LOGGER.info("GHG Bot is now online!")
