@@ -17,6 +17,8 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.interactions.InteractionHook
 import java.time.Instant
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class TicketButtonHandler : ButtonEvent {
@@ -39,7 +41,9 @@ class TicketButtonHandler : ButtonEvent {
             "TICKET-CLOSE-REPORTPROOF" -> {
                 it.message.editMessageComponents().queue()
                 it.deferReply().queue()
-                closeTicket(getChannel(it) ?: return, it.hook, member, "Kein gültiger Nachweis. Wir können nur Reports mit bewertbaren Nachweisen bearbeiten!")
+                val reason = "Da du keinen (gültigen) Beweis liefern konntest, wurde dein Ticket geschlossen. Bitte füge in Zukunft immer einen handfesten Beweis an!"
+                it.channel.send("# Fehlender Nachweis\n$reason").queue()
+                closeTicket(getChannel(it) ?: return, it.hook, member, reason, 1.minutes)
             }
         }
     }
@@ -52,8 +56,7 @@ class TicketButtonHandler : ButtonEvent {
         } else channel
     }
 
-    private fun closeTicket(channel: ThreadChannel, hook: InteractionHook, member: Member, closeMessage: String) {
-        hook.editMessage(content = "Ticket wird in 5s geschlossen...").queue()
+    private fun closeTicket(channel: ThreadChannel, hook: InteractionHook, member: Member, closeMessage: String, delay: Duration = 3.seconds) {
         channel.getHistoryFromBeginning(100).queue { history ->
             CoroutineScope(Dispatchers.Default).launch {
                 val ticketUser = channel.threadMembers.filter {
@@ -66,6 +69,8 @@ class TicketButtonHandler : ButtonEvent {
                     channel.send("Etwas ist schiefgelaufen beim schließen...").queue()
                     null
                 } else guildGHG.getMemberById(ownerID) ?: guildGHG.retrieveMemberById(ownerID).complete()
+
+                hook.editMessage(content = "${owner?.asMention ?: ""} Ticket wird in $delay geschlossen...").queue()
 
                 val embed = Embed {
                     title = "<:ghg:1059233059532197979>  || Ticket Geschlossen"
@@ -92,7 +97,7 @@ class TicketButtonHandler : ButtonEvent {
                     }
                 }
 
-                delay(5.seconds)
+                delay(delay)
                 channel.manager
                     .setLocked(true)
                     .setArchived(true)
