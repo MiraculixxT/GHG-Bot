@@ -1,23 +1,15 @@
 package de.miraculixx.ghg_bot.commands
 
-import de.miraculixx.ghg_bot.modules.auto_support.SupportFilter
+import de.miraculixx.ghg_bot.config.ConfigManager
 import de.miraculixx.ghg_bot.utils.entities.SlashCommandEvent
-import de.miraculixx.ghg_bot.utils.extensions.enumOf
-import de.miraculixx.ghg_bot.utils.extensions.json
-import de.miraculixx.ghg_bot.utils.extensions.loadConfig
 import de.miraculixx.ghg_bot.utils.log.noGuild
 import dev.minn.jda.ktx.coroutines.await
-import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.reply_
-import dev.minn.jda.ktx.messages.send
-import kotlinx.serialization.encodeToString
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import java.io.File
 
 object HelpCommand : SlashCommandEvent {
-    private val presetFile = File("config/presets.json")
     // <name, content>
-    val presets: MutableMap<String, String> = presetFile.loadConfig(mutableMapOf())
+    val presets = ConfigManager.moderation.supportPresets
 
     override suspend fun trigger(it: SlashCommandInteractionEvent) {
         if (it.guild == null) {
@@ -43,7 +35,7 @@ object HelpCommand : SlashCommandEvent {
                 val msg = it.channel.retrieveMessageById(msgID).await()
                 val content = msg.contentRaw
                 presets[name] = content
-                save()
+                ConfigManager.save()
                 it.reply_("Preset `$name` erfolgreich erstellt mit folgendem Inhalt!\n\n$content", ephemeral = true).queue()
             }
 
@@ -54,13 +46,9 @@ object HelpCommand : SlashCommandEvent {
                     it.reply_("Kein Preset mit dem Namen `$name` gefunden!", ephemeral = true).queue()
                     return
                 }
-                save()
+                ConfigManager.save()
                 it.reply_("Preset `$name` erfolgreich entfernt!", ephemeral = true).queue()
             }
         }
-    }
-
-    fun save() {
-        presetFile.writeText(json.encodeToString(presets))
     }
 }

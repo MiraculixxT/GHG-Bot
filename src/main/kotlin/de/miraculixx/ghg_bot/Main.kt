@@ -52,8 +52,6 @@ class Main {
                         ConfigManager.save()
                         Warnings.save()
 
-                        HelpCommand.save()
-
                         JDA.shardManager?.setStatus(OnlineStatus.OFFLINE)
                         JDA.shutdown()
                     }
@@ -61,8 +59,6 @@ class Main {
                     "save" -> {
                         ConfigManager.save()
                         Warnings.save()
-
-                        HelpCommand.save()
 
                         println("Configs saved!")
                     }
