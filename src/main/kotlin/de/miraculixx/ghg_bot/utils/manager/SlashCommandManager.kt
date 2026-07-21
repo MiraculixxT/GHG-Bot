@@ -11,6 +11,7 @@ import dev.minn.jda.ktx.interactions.commands.option
 import dev.minn.jda.ktx.interactions.commands.subcommand
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -20,6 +21,7 @@ import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
+import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
 object SlashCommandManager {
     private val commands = mapOf(
@@ -140,7 +142,9 @@ object SlashCommandManager {
                 subcommand("set-warns", "Ändere Warnungsanzahl") {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
                     addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
-                    option<Int>("amount", "Wie viele?", true)
+                    addOptions(
+                        OptionData(OptionType.INTEGER, "amount", "Wie viele?", true).setMinValue(0)
+                    )
                 }
             },
             Command("message", "Send and handle bot messages") {
@@ -152,7 +156,10 @@ object SlashCommandManager {
             Command("voice", "...") {
                 defaultPermissions = DefaultMemberPermissions.DISABLED
                 subcommand("join", "Join") {
-                    option<VoiceChannel>("channel", "Channel", true)
+                    addOptions(
+                        OptionData(OptionType.CHANNEL, "channel", "Channel", true)
+                            .setChannelTypes(ChannelType.VOICE, ChannelType.STAGE)
+                    )
                 }
             },
             Command("verify", "Verifiziere dich, um mehrere Links oder Anhänge senden zu können"),
