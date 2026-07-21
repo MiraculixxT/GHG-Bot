@@ -69,7 +69,7 @@ class Config(stream: InputStream?, private val name: String) {
 
 
     private fun loadConfig(file: File, input: InputStream) {
-        LOGGER.info(">> Create new Config File - $name")
+        LOGGER.info("Creating new config file: $name.yml")
         if (!file.exists()) {
             file.createNewFile()
             file.writeBytes(input.readAllBytes())
@@ -77,7 +77,7 @@ class Config(stream: InputStream?, private val name: String) {
     }
 
     init {
-        LOGGER.info(">> Load Config - $name")
+        LOGGER.info("Loading config: $name.yml")
         val file = Path("config/$name.yml").toFile()
         configMap = if (stream != null) {
             if (!file.exists()) loadConfig(file, stream)

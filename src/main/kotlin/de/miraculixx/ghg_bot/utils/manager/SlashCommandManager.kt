@@ -41,7 +41,7 @@ object SlashCommandManager {
     fun startListen(jda: JDA) = jda.listener<SlashCommandInteractionEvent> {
         val commandClass = commands[it.name] ?: (if (streamCommands.contains(it.name)) commands["stream-commands"] else null) ?: return@listener
         val options = buildString { it.options.forEach { option -> append(option.asString + " ") } }
-        LOGGER.info(">> ${it.user.asTag} -> /${it.name}${it.subcommandName ?: ""} $options")
+        LOGGER.info("Command executed: ${it.user.asTag} -> /${it.name}${it.subcommandName ?: ""} $options")
         commandClass.trigger(it)
     }
 
@@ -66,11 +66,11 @@ object SlashCommandManager {
 
         JDA.guilds.forEach {
             if (it.idLong == 484676017513037844 || it.idLong == 989881712492298250) return@forEach
-            println("Guild Info: ${it.idLong} - ${it.name} || OwnerID: ${it.retrieveOwner().complete().idLong}")
+            LOGGER.warn("Leaving unauthorized guild ${it.idLong} - ${it.name} (owner ${it.retrieveOwner().complete().idLong})")
             it.leave().queue()
         }
 
-        LOGGER.info("Guilds - ${JDA.guilds.size}")
+        LOGGER.info("Serving ${JDA.guilds.size} guilds")
         JDA.updateCommands().addCommands(
             Command("auto-support", "Setup the regex for auto support messages") {
                 defaultPermissions = DefaultMemberPermissions.DISABLED

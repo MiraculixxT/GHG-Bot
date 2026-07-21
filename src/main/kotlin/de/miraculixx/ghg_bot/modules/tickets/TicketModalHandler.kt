@@ -4,6 +4,7 @@ import de.miraculixx.ghg_bot.JDA
 import de.miraculixx.ghg_bot.utils.cache.ticketQuestionRole
 import de.miraculixx.ghg_bot.utils.cache.ticketReportRole
 import de.miraculixx.ghg_bot.utils.entities.ModalEvent
+import de.miraculixx.ghg_bot.utils.log.LOGGER
 import dev.minn.jda.ktx.generics.getChannel
 import dev.minn.jda.ktx.interactions.components.Container
 import dev.minn.jda.ktx.interactions.components.EntitySelectMenu
@@ -42,7 +43,7 @@ object TicketModalHandler : ModalEvent {
         val hook = it.hook
         val channel = it.channel
         if (channel !is TextChannel) return
-        println("Modal: ${it.modalId} by ${member.user.name} in channel ${channel.name}")
+        LOGGER.info("Ticket modal '${it.modalId}' submitted by ${member.user.name} (${member.id}) in #${channel.name}")
 
         when (it.modalId) {
             "TICKET-REPORT" -> {
@@ -81,6 +82,7 @@ object TicketModalHandler : ModalEvent {
         CoroutineScope(Dispatchers.Default).launch {
             val thread = reportChannel.createThreadChannel(type.prefix + user.name, true)
                 .setInvitable(false).complete()
+            LOGGER.info("Ticket ${type.name} opened by ${user.name} (${user.id}) -> thread ${thread.id}")
             val ping = when (type) {
                 TicketType.OTHER -> ticketQuestionRole.asMention
                 TicketType.REPORT -> ticketReportRole.asMention

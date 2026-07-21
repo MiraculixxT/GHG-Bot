@@ -5,6 +5,7 @@ import de.miraculixx.ghg_bot.utils.cache.teamRole
 import de.miraculixx.ghg_bot.utils.entities.ButtonEvent
 import de.miraculixx.ghg_bot.utils.extensions.toMember
 import de.miraculixx.ghg_bot.utils.extensions.toUUID
+import de.miraculixx.ghg_bot.utils.log.LOGGER
 import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.reply_
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
@@ -56,12 +57,12 @@ class ButtonsVote : ButtonEvent {
         val allVotes = votes.first + votes.second
         if (allVotes >= 10 || isMod) {
             val percent = votes.first / allVotes
-            println("Voter Percentage: $percent (${votes.first} / ${votes.second})")
+            LOGGER.debug("Report $reportID vote tally: ${votes.first} yes / ${votes.second} no (threshold reached)")
 
             if (percent >= 0.7) { // Warn reported user and delete
                 val member = report.message.author.idLong.toMember()
                 if (member != null) Warnings.warnMember(member, "Nachricht ist nicht Regelkonform (Community Voting)\n```fix\n${report.message.contentDisplay}```", true)
-                else println("Report target was null!")
+                else LOGGER.warn("Report $reportID confirmed but target member not found (user left?)")
                 report.message.delete().queue()
 
                 val reporterTrust = UserModerationManager.userTrust.getOrPut(report.snitch.idLong) { UserTrust(report.snitch.idLong, 0, 0) }

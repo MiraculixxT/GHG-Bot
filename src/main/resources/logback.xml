@@ -1,11 +1,14 @@
 <configuration>
+    <conversionRule conversionWord="levelcolor" class="de.miraculixx.ghg_bot.utils.log.LogHighlighter"/>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>false</withJansi>
         <encoder>
-            <pattern>[%d{yyyy.MM.dd HH:mm:ss}] [%level] %msg%n</pattern>
+            <pattern>%levelcolor([%d{yyyy.MM.dd HH:mm:ss}] [%level] %msg%n)</pattern>
         </encoder>
     </appender>
 
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

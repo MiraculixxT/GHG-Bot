@@ -3,30 +3,24 @@ package de.miraculixx.ghg_bot.modules.other
 import de.miraculixx.ghg_bot.JDA
 import de.miraculixx.ghg_bot.utils.cache.guildGHG
 import de.miraculixx.ghg_bot.utils.entities.EventListener
+import de.miraculixx.ghg_bot.utils.log.LOGGER
 import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.events.CoroutineEventListener
 import dev.minn.jda.ktx.events.listener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.dv8tion.jda.api.components.Component
-import net.dv8tion.jda.api.components.actionrow.ActionRow
 import net.dv8tion.jda.api.components.buttons.Button
 import net.dv8tion.jda.api.components.container.Container
 import net.dv8tion.jda.api.components.section.Section
-import net.dv8tion.jda.api.components.section.SectionAccessoryComponent
-import net.dv8tion.jda.api.components.section.SectionAccessoryComponentUnion
 import net.dv8tion.jda.api.components.separator.Separator
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay
-import net.dv8tion.jda.api.components.thumbnail.Thumbnail
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
-import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent
 import net.dv8tion.jda.internal.entities.ForumTagImpl
-import kotlin.collections.plus
 
 object FanartHighlighting: EventListener {
     private val fanartChannel = 1048240752095936542
@@ -55,20 +49,20 @@ object FanartHighlighting: EventListener {
     }
 
     private suspend fun addTag(member: Member?, message: Message, thread: ThreadChannel) {
-        println("Detected 25+ (${thread.id})")
+        LOGGER.info("Fanart thread ${thread.id} reached 25+ reactions")
         val tags = thread.appliedTags
         if (tags.contains(highlightTag) || !tags.contains(fanartTag)) return
-        println(" - Adding highlight tag")
+        LOGGER.info("Adding highlight tag to fanart thread ${thread.id}")
         thread.manager.setAppliedTags(thread.appliedTags + highlightTag).queue()
         member?.user?.sendHighlightAnnouncement(false, message.jumpUrl)
     }
 
     private suspend fun addRole(member: Member?, message: Message) {
         member ?: return
-        println("Detected 40+ (Member: ${member.idLong})")
+        LOGGER.info("Fanart member ${member.idLong} reached 40+ reactions")
         val role = guildGHG.getRoleById(roleID)
         if (role == null || member.roles.contains(role)) return
-        println(" - Adding fanart role")
+        LOGGER.info("Adding fanart role to member ${member.idLong}")
         member.guild.addRoleToMember(member, role).queue()
         member.user.sendHighlightAnnouncement(true, message.jumpUrl)
     }

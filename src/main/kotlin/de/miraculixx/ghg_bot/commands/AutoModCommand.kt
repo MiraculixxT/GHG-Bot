@@ -4,6 +4,7 @@ import de.miraculixx.ghg_bot.config.ConfigManager
 import de.miraculixx.ghg_bot.modules.auto_support.SupportFilter
 import de.miraculixx.ghg_bot.utils.entities.SlashCommandEvent
 import de.miraculixx.ghg_bot.utils.extensions.enumOf
+import de.miraculixx.ghg_bot.utils.log.LOGGER
 import de.miraculixx.ghg_bot.utils.log.noGuild
 import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.reply_
@@ -25,7 +26,7 @@ class AutoModCommand : SlashCommandEvent {
                 title = "Aktuelle Filter für $filter"
                 description = buildString {
                     ConfigManager.regex[filterEnum]?.forEach { s ->
-                        println(s)
+                        LOGGER.debug("Support filter '$filter' entry: $s")
                         append("- $s\n")
                     }
                 }

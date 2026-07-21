@@ -5,6 +5,7 @@ import de.miraculixx.ghg_bot.Main
 import de.miraculixx.ghg_bot.utils.cache.guildGHG
 import de.miraculixx.ghg_bot.utils.entities.SlashCommandEvent
 import de.miraculixx.ghg_bot.utils.extensions.json
+import de.miraculixx.ghg_bot.utils.log.LOGGER
 import de.miraculixx.ghg_bot.utils.log.noGuild
 import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.interactions.components.*
@@ -97,9 +98,9 @@ class AdminCommand : SlashCommandEvent {
                         header("Content-Type", "application/json")
                         setBody("{\"or_query\": {   \"safety_signals\": {    \"unusual_account_activity\":true   }  },  \"and_query\":{},  \"limit\":1000 }")
                     }
-                println("Response: ${response.status.value} - ${response.status.description} (${JDA.token})")
+                LOGGER.info("Sussy member search response: ${response.status.value} ${response.status.description}")
                 val rawResp = response.bodyAsText()
-                println(rawResp.take(100) + "...")
+                LOGGER.debug("Sussy member search raw body (first 100 chars): ${rawResp.take(100)}...")
                 val susMembers = try {
                     json.decodeFromString<UserLookUp>(rawResp)
                 } catch (e: Exception) {
@@ -108,7 +109,7 @@ class AdminCommand : SlashCommandEvent {
                     return
                 }
 
-                println("Parsed ${susMembers.members.size} members with sussy signals.")
+                LOGGER.info("Parsed ${susMembers.members.size} members with suspicious signals")
                 val first = susMembers.members.firstOrNull()
                 val last = susMembers.members.lastOrNull()
                 if (first == null || last == null) {
@@ -121,10 +122,10 @@ class AdminCommand : SlashCommandEvent {
                         b.editMessage("Pruning ${susMembers.members.size} sussy members...")
                             .setComponents(ActionRow.of(b.button.asDisabled())).queue()
                         val members = guildGHG.loadMembers().await()
-                        println("Loaded ${members.size} members from the guild.")
+                        LOGGER.info("Loaded ${members.size} guild members for sussy prune")
                         val users = susMembers.members.mapNotNull {
                             try {
-                                println("Retrieving member: ${it.member.user.id} (${it.member.user.username})")
+                                LOGGER.debug("Resolving sussy member ${it.member.user.id} (${it.member.user.username})")
                                 guildGHG.getMemberById(it.member.user.id)
                                     ?: guildGHG.retrieveMember(UserSnowflake.fromId(it.member.user.id)).await()
                             } catch (e: Exception) {
@@ -139,7 +140,7 @@ class AdminCommand : SlashCommandEvent {
                         return@button
                     }
                 }
-                println("Edit message")
+                LOGGER.debug("Sending sussy-member prune confirmation prompt")
                 msg.editMessage(
                     content = "Found ${susMembers.members.size} sussy members.\n- From: <@${first.member.user.id}> (${first.member.joined_at})\n- To: <@${last.member.user.id}> (${last.member.joined_at})",
                     components = listOf(
@@ -163,9 +164,9 @@ class AdminCommand : SlashCommandEvent {
             color = 0xff0000
         }
 
-        println("Start pruning ${members.size} members...")
+        LOGGER.info("Start pruning ${members.size} suspicious members...")
         val snowflakes = members.map { UserSnowflake.fromId(it.user.id) }
-        println("Snowflakes: ${snowflakes.size} members")
+        LOGGER.debug("Prepared ${snowflakes.size} snowflakes for unban scheduling")
         try {
             File("prune_sus_members.json").writeText(json.encodeToString(members.map { it.id }))
         } catch (e: Exception) {
@@ -174,7 +175,7 @@ class AdminCommand : SlashCommandEvent {
         }
         launch {
             while (count.get() < total) {
-                println("Temporary pruning: ${count.get()} / $total")
+                LOGGER.info("Pruning progress: ${count.get()} / $total members")
                 event.editMessage(
                     content = "Pruning **${count.get()} / $total** sussy members..."
                 ).queue()
@@ -187,7 +188,7 @@ class AdminCommand : SlashCommandEvent {
                 snowflakes.forEach {
                     runCatching {
                         guildGHG.unban(it).queue()
-                        println("Unbanned ${it.id}")
+                        LOGGER.info("Unbanned pruned member ${it.id}")
                     }
                 }
             }
@@ -204,7 +205,7 @@ class AdminCommand : SlashCommandEvent {
                     }.await()
                     val id = member.id
                     member.ban(1, TimeUnit.SECONDS).await()
-                    println("Banned $id")
+                    LOGGER.info("Banned suspicious member $id")
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

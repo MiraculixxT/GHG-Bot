@@ -2,24 +2,23 @@ package de.miraculixx.ghg_bot.modules.user_moderation
 
 import club.minnced.discord.webhook.send.WebhookMessageBuilder
 import de.miraculixx.ghg_bot.utils.extensions.mentionlessContent
+import de.miraculixx.ghg_bot.utils.log.LOGGER
 import dev.minn.jda.ktx.interactions.components.danger
 import dev.minn.jda.ktx.interactions.components.success
 import dev.minn.jda.ktx.messages.Embed
-import dev.minn.jda.ktx.messages.edit
 import dev.minn.jda.ktx.messages.send
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import net.dv8tion.jda.api.components.actionrow.ActionRow
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
-import net.dv8tion.jda.api.components.actionrow.ActionRow
 import net.dv8tion.jda.api.interactions.InteractionHook
-import kotlinx.coroutines.future.await as awaitFuture
 import java.util.*
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.future.await as awaitFuture
 
 
 data class MessageReport(
@@ -94,8 +93,8 @@ data class MessageReport(
     }
 
     private fun buildEmbed(votes: Pair<Int, Int>) = Embed {
-        println(votes.toString() + " - ${votes.first.toFloat() / (votes.second + votes.first)} - ${(votes.first.toFloat() / (votes.second + votes.first)) * 100}")
         val percentage = ((votes.first.toFloat() / (votes.second + votes.first)) * 100).roundToInt()
+        LOGGER.debug("Rebuilding report embed: ${votes.first} yes / ${votes.second} no ($percentage% suspicious)")
         title = "🔨 || Neue Meldung"
         field("Grund 📧", "```fix\n$reason ${if (message.attachments.isNotEmpty()) "(Anhänge siehe Kontext)" else ""}```", false)
         field("Nachricht \uD83D\uDCAC", "> ${finalMessage.ifBlank { "`<Leere Nachricht - Siehe Kontext>`" }}", false)

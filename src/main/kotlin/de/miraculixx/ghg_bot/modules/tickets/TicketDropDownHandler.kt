@@ -3,6 +3,7 @@ package de.miraculixx.ghg_bot.modules.tickets
 import de.miraculixx.ghg_bot.utils.cache.embedAd
 import de.miraculixx.ghg_bot.utils.cache.embedApplication
 import de.miraculixx.ghg_bot.utils.entities.DropDownEvent
+import de.miraculixx.ghg_bot.utils.log.LOGGER
 import dev.minn.jda.ktx.interactions.components.TextInput
 import dev.minn.jda.ktx.interactions.components.button
 import dev.minn.jda.ktx.interactions.components.replyModal
@@ -42,7 +43,7 @@ class TicketDropDownHandler : DropDownEvent {
 
     override suspend fun trigger(it: GenericSelectMenuInteractionEvent<String, StringSelectMenu>) {
         val selected = it.values.firstOrNull()
-        println(selected)
+        LOGGER.info("Ticket category '$selected' selected by ${it.user.name} (${it.user.id})")
         when (selected) {
             "WERBUNG" -> it.reply_(embeds = listOf(embedAd), ephemeral = true).queue()
             "BEWERBUNG" -> it.reply_(embeds = listOf(embedApplication), ephemeral = true).queue()
