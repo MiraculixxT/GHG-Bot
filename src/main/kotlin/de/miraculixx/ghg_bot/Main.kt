@@ -13,7 +13,6 @@ import de.miraculixx.ghg_bot.modules.other.MediaOnlyChannel
 import de.miraculixx.ghg_bot.modules.other.ThreadChannel
 import de.miraculixx.ghg_bot.modules.other.StickyMessage
 import de.miraculixx.ghg_bot.modules.tickets.TicketMessages
-import de.miraculixx.ghg_bot.modules.user_moderation.UserModerationManager
 import de.miraculixx.ghg_bot.modules.voice.AlwaysOneFree
 import de.miraculixx.ghg_bot.utils.log.LOGGER
 import de.miraculixx.ghg_bot.utils.manager.ButtonManager
@@ -54,7 +53,6 @@ class Main {
                         running = false
                         ConfigManager.save()
                         Warnings.save()
-                        UserModerationManager.save()
 
                         CommandOnlyChannel.save()
                         MediaOnlyChannel.save()
@@ -68,7 +66,6 @@ class Main {
                     "save" -> {
                         ConfigManager.save()
                         Warnings.save()
-                        UserModerationManager.save()
 
                         CommandOnlyChannel.save()
                         MediaOnlyChannel.save()

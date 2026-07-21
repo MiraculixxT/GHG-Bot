@@ -29,7 +29,6 @@ object SlashCommandManager {
         "warnings" to WarnCommand(),
         "stream-commands" to StreamCommands(),
         "report" to ReportCommand(),
-        "reputation" to UserModerationCommand(),
         "message" to MessageCommand(),
         "channel" to ChannelCommand(),
         "voice" to VoiceCommand,
@@ -127,9 +126,6 @@ object SlashCommandManager {
                 subcommand("clear-threads", "Lösche alle threads") {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
                 }
-                subcommand("vote-info", "Printe vote info") {
-                    defaultPermissions = DefaultMemberPermissions.DISABLED
-                }
                 subcommand("prune-sus-member", "Prune users with sus signal") {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
                 }
@@ -148,20 +144,6 @@ object SlashCommandManager {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
                     addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
                     option<Int>("amount", "Wie viele?", true)
-                }
-            },
-            Command("reputation", "Manage User Reputation") {
-                defaultPermissions = DefaultMemberPermissions.DISABLED
-                subcommand("add", "Add Reputation to a User") {
-                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
-                    option<Int>("points", "Wie viele Punkte?", true)
-                }
-                subcommand("remove", "Remove Reputation from a User") {
-                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
-                    option<Int>("points", "Wie viele Punkte?", true)
-                }
-                subcommand("get", "Get Reputation of a User") {
-                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
                 }
             },
             Command("message", "Send and handle bot messages") {

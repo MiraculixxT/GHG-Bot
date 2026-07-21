@@ -66,30 +66,6 @@ class AdminCommand : SlashCommandEvent {
                 (it.guildChannel as TextChannel).threadChannels.forEach { thread -> thread.delete().queue() }
             }
 
-            "vote-info" -> {
-                it.channel.send(
-                    "## Wie funktioniert das Report-System? <:ban:742347113538781224> \n" +
-                            "\n" +
-                            "1. **Report-Kanal:** Gehe zum <#1193169356239163432>-Channel, um die aktuellen **Reports** zu sehen und abzustimmen. Klicke auf den unteren **Button** um mit zu machen!\n" +
-                            "\n" +
-                            "2. **Melden von Nachrichten:** Du kannst Nachrichten melden, indem du mit der rechten Maustaste auf die **Nachricht** klickst, dann auf **Apps** gehst und ``Nachricht melden`` auswählst. Auf mobile drücke länger auf die Nachricht und dann auf Apps.\n" +
-                            "\n" +
-                            "3. **Abstimmen:** Nutze die Buttons unter jedem aktiven Report, um abzustimmen.\n" +
-                            "\n" +
-                            "## Warum ist richtiges Voten wichtig? <:baseg:1062108033288786072>\n" +
-                            "\n" +
-                            "Wenn du konsequent korrekt und zuverlässig votest, baust du Vertrauen auf. Vertrauenswürdige Mitglieder haben die Möglichkeit, eine größere Rolle bei Entscheidungen zu spielen und helfen, den Server für alle angenehm zu gestalten <:PeepoGlad:1062106500056743947> \n" +
-                            "\n" +
-                            "*Dieses System ist noch in der Beta, bei Fragen oder Problemen bitte an <@341998118574751745> wenden*",
-                    components = listOf(
-                        ActionRow.of(
-                            success("REPORT-ADMIN:OPTIN", "Teilnehmen"),
-                            secondary("REPORT-ADMIN:POINTS", "Erhaltene Punkte")
-                        )
-                    )
-                ).queue()
-            }
-
             "prune-sus-member" -> {
                 val msg = it.reply_("Searching for sussy members...").await()
                 val response =
