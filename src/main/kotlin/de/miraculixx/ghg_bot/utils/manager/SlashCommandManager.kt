@@ -11,6 +11,7 @@ import dev.minn.jda.ktx.interactions.commands.option
 import dev.minn.jda.ktx.interactions.commands.subcommand
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent
@@ -132,19 +133,17 @@ object SlashCommandManager {
             Command("warnings", "Verwalte Warnungen") {
                 subcommand("amount", "Erhalte die Menge an Warnungen") {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
-                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
+                    option<User>("user", "Welcher Nutzer?", true)
                 }
                 subcommand("warn", "Warne einen Nutzer") {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
-                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
+                    option<User>("user", "Welcher Nutzer?", true)
                     option<String>("reason", "Warum?", true)
                 }
                 subcommand("set-warns", "Ändere Warnungsanzahl") {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
-                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
-                    addOptions(
-                        OptionData(OptionType.INTEGER, "amount", "Wie viele?", true).setMinValue(0)
-                    )
+                    option<User>( "user", "Welcher Nutzer?", true)
+                    option<Int>("amount", "Wie viele?", true) { setMinValue(0) }
                 }
             },
             Command("message", "Send and handle bot messages") {
@@ -156,10 +155,7 @@ object SlashCommandManager {
             Command("voice", "...") {
                 defaultPermissions = DefaultMemberPermissions.DISABLED
                 subcommand("join", "Join") {
-                    addOptions(
-                        OptionData(OptionType.CHANNEL, "channel", "Channel", true)
-                            .setChannelTypes(ChannelType.VOICE, ChannelType.STAGE)
-                    )
+                    option<VoiceChannel>("channel", "Channel", true)
                 }
             },
             Command("verify", "Verifiziere dich, um mehrere Links oder Anhänge senden zu können"),
