@@ -11,6 +11,7 @@ import dev.minn.jda.ktx.interactions.commands.option
 import dev.minn.jda.ktx.interactions.commands.subcommand
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -18,7 +19,6 @@ import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEven
 import net.dv8tion.jda.api.interactions.InteractionContextType
 import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
-import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 
 object SlashCommandManager {
@@ -130,17 +130,17 @@ object SlashCommandManager {
             Command("warnings", "Verwalte Warnungen") {
                 subcommand("amount", "Erhalte die Menge an Warnungen") {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
-                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
+                    option<User>("user", "Welcher Nutzer?", true)
                 }
                 subcommand("warn", "Warne einen Nutzer") {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
-                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
+                    option<User>("user", "Welcher Nutzer?", true)
                     option<String>("reason", "Warum?", true)
                 }
                 subcommand("set-warns", "Ändere Warnungsanzahl") {
                     defaultPermissions = DefaultMemberPermissions.DISABLED
-                    addOption(OptionType.USER, "user", "Welcher Nutzer?", true)
-                    option<Int>("amount", "Wie viele?", true)
+                    option<User>( "user", "Welcher Nutzer?", true)
+                    option<Int>("amount", "Wie viele?", true) { setMinValue(0) }
                 }
             },
             Command("message", "Send and handle bot messages") {
